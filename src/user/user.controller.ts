@@ -16,8 +16,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  async getUser(@Body('userName') data: string, @Res() res) {
-    const user = await this.userService.getUserByUserName(data);
+  async getUser(@Body('username') data: string, @Res() res) {
+    const user = await this.userService.getUserByusername(data);
     let status = HttpStatus.OK;
     let response = {};
     if (user === false) {
@@ -31,7 +31,7 @@ export class UserController {
     return res.status(status).json(response);
   }
 
-  @Post()
+  @Post('/create')
   async createUser(@Body('user') data: User, @Res() res) {
     const user = await this.userService.createUser(data);
     let status = HttpStatus.OK;
@@ -48,8 +48,8 @@ export class UserController {
   }
 
   @Patch()
-  async updateUser(@Body('user') data: User,@Body('userName') userName: string, @Res() res) {
-    const user = await this.userService.updateUser(userName, data);
+  async updateUser(@Body('user') data: User, @Body('username') username: string, @Res() res) {
+    const user = await this.userService.updateUser(username, data);
     let status = HttpStatus.OK;
     let response = {};
     if (user === false) {
@@ -64,8 +64,8 @@ export class UserController {
   }
 
   @Delete()
-  async deleteUser(@Body('userName') userName: string, @Res() res) {
-    const user = await this.userService.deleteUser(userName);
+  async deleteUser(@Body('username') username: string, @Res() res) {
+    const user = await this.userService.deleteUser(username);
     let status = HttpStatus.OK;
     let response = {};
     if (user === false) {
@@ -77,6 +77,28 @@ export class UserController {
       response = {
         message: 'User deleted',
       };
+    }
+    return res.status(status).json(response);
+  }
+
+  @Post('/signin')
+  async signin(@Body('logindata') loginData, @Res() res) {
+    const user = await this.userService.signin(loginData.username, loginData.password);
+    let status = HttpStatus.OK;
+    let response = {};
+    if (user === false) {
+      status = HttpStatus.BAD_REQUEST;
+      response = {
+        message: 'User not found',
+      }
+    } else if(user === true) {
+      status = HttpStatus.OK;
+      response = {
+        message: 'Wrong password',
+      }
+    } else {
+      status = HttpStatus.OK;
+      response = { user };
     }
     return res.status(status).json(response);
   }
