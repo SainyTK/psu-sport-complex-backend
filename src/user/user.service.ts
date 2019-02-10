@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { Injectable, Inject, Body } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { User } from './model/user.model';
 
 const saltRounds = 10;
@@ -42,15 +42,7 @@ export class UserService {
     return false;
   }
 
-  async signin(username: string, password: string) {
-    const user = await this.user.findOne({where: {username}});
-    if (user) {
-      const isPasswordCorrect = await bcrypt.compare(password, user.password);
-      if (isPasswordCorrect) {
-        return user;
-      }
-      return true;
-    }
-    return false;
+  async validatePassword(user: User, password: string) {
+    return await bcrypt.compare(password, user.password);
   }
 }
