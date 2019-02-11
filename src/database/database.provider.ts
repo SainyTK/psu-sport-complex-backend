@@ -1,8 +1,10 @@
 import { Sequelize } from 'sequelize-typescript';
-
 import { dbConfig } from '../config/db.config';
+
 import { User } from '../user/model/user.model';
 import { Stadium } from '../stadium/model/stadium.model';
+import { Court } from '../court/model/court.model';
+import { Booking } from '../booking/model/booking.model';
 
 export const DatabaseProviders = [
     {
@@ -16,7 +18,12 @@ export const DatabaseProviders = [
                 password: dbConfig.password,
                 database: dbConfig.database,
             });
-            sequelize.addModels([User, Stadium]);
+            sequelize.addModels([
+                User,
+                Stadium,
+                Court,
+                Booking
+            ]);
             await sequelize.sync();
             return sequelize;
         },

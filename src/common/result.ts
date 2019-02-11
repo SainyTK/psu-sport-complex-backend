@@ -55,17 +55,23 @@ export class Result {
         };
     }
 
-    exist(data) {
+    exist(data = null) {
         const status = HttpStatus.CREATED;
+        let result;
+        result = {
+            statusCode: status,
+            message: `${this.title} is already exist`,
+        };
+        if (data) {
+            result = {
+                ...result,
+                data: data,
+            }
+        }
         return {
             status: status,
-            response: {
-                statusCode: status,
-                message: `${this.title} is already exist`,
-                data: data
-            }
+            response: result
         };
     }
-
 
 }
