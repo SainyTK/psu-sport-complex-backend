@@ -3,6 +3,9 @@ import { Booking } from './model/booking.model';
 import { Result } from 'src/common/result';
 import { BookingDTO } from './dto/booking.dto';
 import { Sequelize } from 'sequelize-typescript';
+import TimeUtils from '../common/utils/time-utils';
+import { User } from 'src/user/model/user.model';
+import { Court } from 'src/court/model/court.model';
 
 @Injectable()
 export class BookingService {
@@ -14,6 +17,27 @@ export class BookingService {
 
   async findAll() {
     const bookings = await this.booking.findAll();
+    return this.result.found(bookings);
+  }
+
+  async findCurrentWeek() {
+    const Op = Sequelize.Op;
+    const todayZOclock = TimeUtils.zeroOclock(new Date());
+    const dayNextWeekZOclock = TimeUtils.zeroOclock(TimeUtils.nextXDate(new Date(), 7));
+
+    const bookings = await this.booking.findAll({
+      include: [User, Court],
+      where: {
+        finishTime: {
+          [Op.between]: [
+            todayZOclock,
+            dayNextWeekZOclock
+          ]
+        }
+      },
+      order: [['startTime']]
+    });
+
     return this.result.found(bookings);
   }
 

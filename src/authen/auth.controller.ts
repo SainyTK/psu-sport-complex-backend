@@ -11,7 +11,7 @@ import { AuthService } from './auth.service';
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
-  @Post('getToken')
+  @Post()
   async getToken(@Body('username') username, @Body('password') password, @Res() res) {
     const token = await this.authService.signin(username, password);
     let response = {};

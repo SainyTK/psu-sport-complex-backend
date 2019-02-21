@@ -14,16 +14,22 @@ import { ValidationPipe } from 'src/common/validation.pipe';
 export class BookingController {
   constructor(private readonly bookingService: BookingService) { }
 
-  @Get()
+  @Get('/all')
   async findAll(@Res() res) {
-    console.log(new Date());
     const result = await this.bookingService.findAll();
+    return res.status(result.status).json(result.response);
+  }
+
+  @Get('/')
+  async findCurrentWeek(@Res() res) {
+    const result = await this.bookingService.findCurrentWeek();
     return res.status(result.status).json(result.response);
   }
 
   @UsePipes(new ValidationPipe())
   @Post()
   async book(@Body() dto:BookingDTO, @Res() res) {
+    console.log(dto);
     const result = await this.bookingService.book(dto);
     return res.status(result.status).json(result.response);
   }

@@ -34,8 +34,8 @@ export class UserController {
     return res.status(status).json(response);
   }
 
-  @Post('/create')
-  async createUser(@Body('user') data: User, @Res() res) {
+  @Post()
+  async createUser(@Body() data: User, @Res() res) {
     const user = await this.userService.createUser(data);
     let status = HttpStatus.OK;
     let response = {};

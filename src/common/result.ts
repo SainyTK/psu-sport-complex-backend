@@ -13,8 +13,7 @@ export class Result {
         return {
             status: status,
             response: {
-                statusCode: status,
-                error: 'Bad Request',
+                error: 'Bad Request'
             }
         };
     }
@@ -22,11 +21,10 @@ export class Result {
     success(action, data = null) {
         const status = HttpStatus.OK;
         let result = {};
-        result = { statusCode: status }
         if (action)
-            result = { ...result, message: `${action} successfully` };
+            result = { message: `${action} successfully` };
         if (data)
-            result = { ...result, data: data };
+            result = { ...result, data };
         return {
             status: status,
             response: result
@@ -37,10 +35,7 @@ export class Result {
         const status = HttpStatus.OK;
         return {
             status: status,
-            response: {
-                statusCode: status,
-                data: data
-            }
+            response: data
         };
     }
 
@@ -49,7 +44,6 @@ export class Result {
         return {
             status: status,
             response: {
-                statusCode: status,
                 error: `Not Found`
             }
         };
@@ -59,13 +53,12 @@ export class Result {
         const status = HttpStatus.CREATED;
         let result;
         result = {
-            statusCode: status,
             message: `${this.title} is already exist`,
         };
         if (data) {
             result = {
                 ...result,
-                data: data,
+                data,
             }
         }
         return {
