@@ -11,7 +11,7 @@ import {
 } from 'sequelize-typescript';
 import { User } from 'src/user/model/user.model';
 import { Court } from 'src/court/model/court.model';
-import { BOOKING_STATUS } from '../enum/booking.enum';
+import { BOOKING_STATUS } from '../constant/booking-status';
 
 @Table({
     timestamps: true,
@@ -33,9 +33,9 @@ export class Booking extends Model<Booking> {
     description: string;
 
     @AllowNull(false)
-    @Default(BOOKING_STATUS.PAID)
+    @Default(BOOKING_STATUS.UNPAID)
     @Column({field: 'status_id'})
-    statusId: number;
+    status: string;
 
     @ForeignKey(() => User)
     @AllowNull(false)

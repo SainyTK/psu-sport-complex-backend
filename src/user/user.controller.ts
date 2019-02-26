@@ -5,15 +5,29 @@ import {
   Res,
   Body,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './model/user.model';
 import { AuthGuard } from '@nestjs/passport';
+import { AuthService } from 'src/authen/auth.service';
+import { extractToken } from 'src/common/utils/extract-token';
 
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly authService: AuthService
+  ) { }
+
+  @UseGuards(AuthGuard())
+  @Patch('/upgrade')
+  async upgradeUser(@Body('username') username: string, @Req() req, @Res() res) {
+    await this.authService.checkAdminFromToken(extractToken(req));
+    const result = await this.userService.upgradeUser(username);
+    return res.json({result});
+  }
 
   @UseGuards(AuthGuard())
   @Patch()
@@ -26,7 +40,7 @@ export class UserController {
   @Delete()
   async deleteUser(@Body('username') username: string, @Res() res) {
     await this.userService.deleteUser(username);
-    return res.json({message: 'delete success'});
+    return res.json({ message: 'delete success' });
   }
 
 }

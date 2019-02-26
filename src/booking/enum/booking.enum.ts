@@ -1,6 +1,0 @@
-export enum BOOKING_STATUS {
-    NOT_PAID,
-    PAID,
-    APPROVED,
-    UNAPPROVED
-}

@@ -7,7 +7,7 @@ import {
     Table,
     Default,
 } from 'sequelize-typescript';
-import { position } from '../enum/user.position';
+import { USER_POSITION } from '../constant/user-position';
 
 @Table({
     timestamps: true,
@@ -42,9 +42,9 @@ export class User extends Model<User> {
     password: string;
 
     @AllowNull(false)
-    @Default(position.GENERAL_PUBLIC)
+    @Default(USER_POSITION.GENERAL_PUBLIC)
     @Column
-    position: position;
+    position: string;
 
     @AllowNull(false)
     @Column
