@@ -11,7 +11,7 @@ export class CourtController {
 
   @Get()
   async findAll(@Res() res) {
-    const result = await this.courtService.findAll();
-    return res.status(result.status).json(result.response);
+    const courts = await this.courtService.findAll();
+    return res.json({courts});
   }
 }

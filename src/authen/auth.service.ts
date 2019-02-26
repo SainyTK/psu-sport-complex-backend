@@ -45,18 +45,22 @@ export class AuthService {
 
     isPasswordCorrect = await this.validatePassword(user, password);
     if (!isPasswordCorrect)
-        throw new UnauthorizedException('incorrect password');
+      throw new UnauthorizedException('incorrect password');
 
     return await this.createToken(JwtPayload.fromModel(user));
   }
 
   async signinWithToken(token: string) {
-    const data = this.jwtService.decode(token) as JwtPayload;
-    const user = await this.validate(data);
-    if (!user)
-      throw new UnauthorizedException('incorrent token');  
-    const newToken = await this.createToken(JwtPayload.fromModel(user));
-    return newToken;
+    try {
+      const data = this.jwtService.decode(token) as JwtPayload;
+      const user = await this.validate(data);
+      if (!user)
+        throw new UnauthorizedException('incorrent token');
+      const newToken = await this.createToken(JwtPayload.fromModel(user));
+      return newToken;
+    } catch (e) {
+      throw new BadRequestException('Token Error');
+    }
   }
 
   private async validatePassword(user: User, password: string) {

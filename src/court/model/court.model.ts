@@ -15,16 +15,16 @@ export class Court extends Model<Court> {
     @AllowNull(false)
     @PrimaryKey
     @AutoIncrement
-    @Column
+    @Column({field: 'court_id'})
     courtId: number;
 
     @AllowNull(false)
     @Column
-    courtName: string;
+    name: string;
 
     @ForeignKey(() => Stadium)
     @AllowNull(false)
-    @Column
+    @Column({field: 'stadium_id'})
     stadiumId: number;
 
     @BelongsTo(() => Stadium)

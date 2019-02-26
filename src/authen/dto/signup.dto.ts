@@ -2,26 +2,26 @@ import { User } from 'src/user/model/user.model';
 import { IsString, IsNumber, IsDateString } from 'class-validator';
 
 export class SignupDTO {
-    @IsString() firstname: string;
-    @IsString() lastname: string;
+    @IsString() fname: string;
+    @IsString() lname: string;
     @IsString() username: string;
     @IsString() email: string;
     @IsString() password: string;
     @IsDateString() dob: Date;
     @IsString() gender: 'M'|'F';
-    @IsNumber() timezone_offset: number;
+    @IsNumber() timezoneOffset: number;
     @IsString() language: string;
 
     public static toUser(dto: SignupDTO): User {
         const user = {
-            fname: dto.firstname,
-            lname: dto.lastname,
+            fname: dto.fname,
+            lname: dto.lname,
             username: dto.username,
             email: dto.email,
             password: dto.password,
             dob: dto.dob,
             gender: dto.gender,
-            timezone_offset: dto.timezone_offset,
+            timezoneOffset: dto.timezoneOffset,
             language: dto.language
         }
         return user as User;

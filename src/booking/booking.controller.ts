@@ -5,10 +5,12 @@ import {
   Res,
   Body,
   UsePipes,
+  UseGuards,
 } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { BookingDTO } from './dto/booking.dto';
 import { ValidationPipe } from 'src/common/validation.pipe';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('booking')
 export class BookingController {
@@ -16,22 +18,22 @@ export class BookingController {
 
   @Get('/all')
   async findAll(@Res() res) {
-    const result = await this.bookingService.findAll();
-    return res.status(result.status).json(result.response);
+    const bookings = await this.bookingService.findAll();
+    return res.json({bookings});
   }
 
   @Get('/')
   async findCurrentWeek(@Res() res) {
-    const result = await this.bookingService.findCurrentWeek();
-    return res.status(result.status).json(result.response);
+    const currentWeekBookings = await this.bookingService.findCurrentWeek();
+    return res.json({currentWeekBookings});
   }
 
+  @UseGuards(AuthGuard())
   @UsePipes(new ValidationPipe())
   @Post()
   async book(@Body() dto:BookingDTO, @Res() res) {
-    console.log(dto);
-    const result = await this.bookingService.book(dto);
-    return res.status(result.status).json(result.response);
+    const result = await this.bookingService.book(BookingDTO.toModel(dto));
+    return res.json({result});
   }
 
 }

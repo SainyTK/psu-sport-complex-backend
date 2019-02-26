@@ -1,7 +1,5 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { Booking } from './model/booking.model';
-import { Result } from 'src/common/result';
-import { BookingDTO } from './dto/booking.dto';
 import { Sequelize } from 'sequelize-typescript';
 import TimeUtils from '../common/utils/time-utils';
 import { User } from 'src/user/model/user.model';
@@ -9,15 +7,10 @@ import { Court } from 'src/court/model/court.model';
 
 @Injectable()
 export class BookingService {
-  private result: Result;
-
-  constructor(@Inject('bookingRepo') private readonly booking: typeof Booking) {
-    this.result = new Result('Booking');
-  }
+  constructor(@Inject('bookingRepo') private readonly booking: typeof Booking) {}
 
   async findAll() {
-    const bookings = await this.booking.findAll();
-    return this.result.found(bookings);
+    return await this.booking.findAll();
   }
 
   async findCurrentWeek() {
@@ -28,47 +21,47 @@ export class BookingService {
     const bookings = await this.booking.findAll({
       include: [User, Court],
       where: {
-        finishTime: {
+        endDate: {
           [Op.between]: [
             todayZOclock,
             dayNextWeekZOclock
           ]
         }
       },
-      order: [['startTime']]
+      order: [['startDate']]
     });
 
-    return this.result.found(bookings);
+    return bookings;
   }
 
-  async book(dto: BookingDTO) {
-    const { startTime, finishTime } = dto;
-    if (startTime > finishTime)
-      return this.result.badRequest();
+  async book(data: Booking) {
+    const { startDate, endDate } = data;
+    if (startDate > endDate)
+      throw new BadRequestException('start date ahead end date');
 
-    const overlapBooking = await this.findOverlapBooking(startTime, finishTime);
+    const overlapBooking = await this.findOverlapBooking(startDate, endDate);
     if(overlapBooking.length > 0)
-      return this.result.exist();
+      throw new BadRequestException('already exist');
 
-    const booking = await this.booking.create(dto);
-    return this.result.success('booking',booking);
+    const booking = await this.booking.create(data);
+    return booking;
   }
 
-  private async findOverlapBooking(startTime: Date, finishTime: Date) {
+  private async findOverlapBooking(startDate: Date, endDate: Date) {
     const Op = Sequelize.Op;
     const bookings = await this.booking.findAll({
       where: {
         [Op.or]: [
           {
-            startTime: {
-              [Op.gte]: startTime,
-              [Op.lt]: finishTime
+            startDate: {
+              [Op.gte]: startDate,
+              [Op.lt]: endDate
             }
           },
           {
-            finishTime: {
-              [Op.gt]: startTime,
-              [Op.lte]: finishTime
+            endDate: {
+              [Op.gt]: startDate,
+              [Op.lte]: endDate
             }
           }
         ]

@@ -1,20 +1,12 @@
-import * as bcrypt from 'bcrypt';
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { User } from './model/user.model';
-
-const saltRounds = 10;
 
 @Injectable()
 export class UserService {
+
   constructor(@Inject('userRepo') private readonly user: typeof User) {}
 
   async createUser(data: User) {
-    const user = await this.user.findOne({where: {username: data.username}});
-    if (user) {
-      return false;
-    }
-    const hashPassword = await bcrypt.hash(data.password, saltRounds);
-    data.password = hashPassword;
     return await this.user.create(data);
   }
 
@@ -23,26 +15,40 @@ export class UserService {
     if (user) {
       return user;
     }
+    throw new NotFoundException('user not found');
+  }
+
+  async checkExistingUser(username: string) {
+    const user = await this.user.findOne({where: {username}});
+    if (user) {
+      return user;
+    }
     return false;
+  }
+
+  async getUserByEmail(email: string) {
+    const user = await this.user.findOne({where: {email}});
+    if (user) {
+      return user;
+    }
+    throw new NotFoundException('user not found');
   }
 
   async updateUser(username: string, data: User) {
     const user = await this.user.findOne({where: {username}});
     if (user) {
-      return await user.update(data);
+      const updatedUser = await user.update(data);
+      return updatedUser
     }
-    return false;
+    throw new NotFoundException('user not found');
   }
 
   async deleteUser(username: string) {
     const user = await this.user.findOne({where: {username}});
     if (user) {
-      return await user.destroy();
+      await user.destroy();
+      return true;
     }
-    return false;
-  }
-
-  async validatePassword(user: User, password: string) {
-    return await bcrypt.compare(password, user.password);
+    throw new NotFoundException('user not found');
   }
 }

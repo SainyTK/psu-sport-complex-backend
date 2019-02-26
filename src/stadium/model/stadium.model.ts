@@ -12,10 +12,26 @@ export class Stadium extends Model<Stadium> {
     @AllowNull(false)
     @PrimaryKey
     @AutoIncrement
-    @Column
-    stadium: number;
+    @Column({field: 'stadium_id'})
+    stadiumId: number;
 
     @AllowNull(false)
     @Column
-    stadiumName: string;
+    name: string;
+
+    @AllowNull(false)
+    @Column({field: 'cost_public'})
+    costPublic: number;
+
+    @AllowNull(false)
+    @Column({field: 'cost_member'})
+    costMember: number;
+
+    @AllowNull(false)
+    @Column({field: 'cost_student'})
+    costStudent: number;
+
+    @AllowNull(false)
+    @Column({field: 'cost_staff'})
+    costStaff: number;
 }
