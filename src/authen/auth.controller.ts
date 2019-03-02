@@ -16,22 +16,22 @@ export class AuthController {
   @Post('/signup')
   @UsePipes(new ValidationPipe())
   async signup(@Body() dto: SignupDTO, @Res() res) {
-    const user = await this.authService.signup(SignupDTO.toUser(dto));
-    return res.json({user});
+    const result = await this.authService.signup(SignupDTO.toUser(dto));
+    return res.json(result);
   } 
 
   @Post('/signin')
   @UsePipes(new ValidationPipe())
   async signinWithUsername(@Body('username') username: string, @Body('password') password: string, @Res() res) {
-    const token = await this.authService.signinWithUsername(username, password);
-    return res.json({token});
+    const result = await this.authService.signinWithUsername(username, password);
+    return res.json(result);
   }
 
   @Post('/sign_token')
   @UsePipes(new ValidationPipe())
   async signWithToken(@Body('accessToken') token: string, @Res() res) {
-    const newToken = await this.authService.signinWithToken(token);
-    return res.json({newToken});
+    const result = await this.authService.signinWithToken(token);
+    return res.json(result);
   }
 
 }

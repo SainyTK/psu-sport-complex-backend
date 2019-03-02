@@ -9,14 +9,24 @@ import { BOOKING_STATUS } from './constant/booking-status';
 @Injectable()
 export class BookingService {
   constructor(
-    @Inject('bookingRepo') private readonly booking: typeof Booking) {}
+    @Inject('bookingRepo') private readonly booking: typeof Booking) { }
 
   async findAll() {
     return await this.booking.findAll();
   }
 
+  async findById(bookingId: number) {
+    return await this.booking.findOne({
+      include: [Court, User],
+      where: { bookingId }
+    });
+  }
+
   async findByUserId(userId: number) {
-    return this.booking.findAll({where: {userId}});
+    return await this.booking.findAll({
+      include: [Court, User],
+      where: { userId }
+    });
   }
 
   async findCurrentWeek() {
@@ -40,12 +50,12 @@ export class BookingService {
     return bookings;
   }
 
-  async uploadSlip(bookingId: number, slip) {
+  async uploadSlip(bookingId: number, filename) {
     const booking = await this.booking.findByPk(bookingId);
     if (!booking)
-      throw new BadRequestException('Not found');
+      return 'booking not found';
 
-    booking.slip = slip;
+    booking.slip = filename;
     booking.status = BOOKING_STATUS.PAID;
 
     return await booking.update(booking);
@@ -54,7 +64,7 @@ export class BookingService {
   async approve(bookingId: number, isApprove: boolean) {
     const booking = await this.booking.findByPk(bookingId);
     if (!booking)
-      throw new BadRequestException('Not found');
+      return 'booking not found'
 
     booking.status = isApprove ? BOOKING_STATUS.APPROVED : BOOKING_STATUS.UNAPPROVED;
 
@@ -64,11 +74,11 @@ export class BookingService {
   async book(data: Booking) {
     const { startDate, endDate } = data;
     if (startDate > endDate)
-      throw new BadRequestException('start date ahead end date');
+      return 'start date lead end date';
 
     const overlapBooking = await this.findOverlapBooking(startDate, endDate);
-    if(overlapBooking.length > 0)
-      throw new BadRequestException('already exist');
+    if (overlapBooking.length > 0)
+      return 'overlap booking';
 
     const booking = await this.booking.create(data);
     return booking;

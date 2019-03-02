@@ -21,7 +21,7 @@ export class Booking extends Model<Booking> {
     @AllowNull(false)
     @PrimaryKey
     @AutoIncrement
-    @Column({field: 'booking_id'})
+    @Column
     bookingId: number;
 
     @AllowNull(true)
@@ -34,12 +34,12 @@ export class Booking extends Model<Booking> {
 
     @AllowNull(false)
     @Default(BOOKING_STATUS.UNPAID)
-    @Column({field: 'status_id'})
+    @Column
     status: string;
 
     @ForeignKey(() => User)
     @AllowNull(false)
-    @Column({field: 'user_id'})
+    @Column
     userId: number;
 
     @BelongsTo(() => User)
@@ -47,21 +47,21 @@ export class Booking extends Model<Booking> {
 
     @ForeignKey(() => Court)
     @AllowNull(false)
-    @Column({field: 'court_id'})
+    @Column
     courtId: number;
 
     @BelongsTo(() => Court)
     court: Court;
 
     @AllowNull(false)
-    @Column({field: 'start_date'})
+    @Column
     startDate: Date;
 
     @AllowNull(false)
-    @Column({field: 'end_date'})
+    @Column
     endDate: Date;
 
-    @Default(false)
+    @Default('')
     @Column
-    slip: boolean;
+    slip: string;
 }

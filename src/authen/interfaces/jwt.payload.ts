@@ -1,6 +1,7 @@
 import { User } from 'src/user/model/user.model';
 
 export class JwtPayload {
+    userId: number;
     fname: string;
     lname: string;
     username: string;
@@ -10,8 +11,9 @@ export class JwtPayload {
     timezoneOffset: number;
     language: string;
 
-    public static fromModel(user: User) {
+    public static fromModel(user) {
         const payload = {
+            userId: user.userId,
             fname: user.fname,
             lname: user.lname,
             username: user.username,

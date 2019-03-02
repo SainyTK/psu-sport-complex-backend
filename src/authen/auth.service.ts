@@ -22,9 +22,9 @@ export class AuthService {
   ) { }
 
   async signup(data: User) {
-    let user = await this.userService.checkExistingUser(data.username);
-    if (user) {
-      throw new BadRequestException('User is already exist');
+    let exist = await this.userService.checkExistingUser(data);
+    if (exist) {
+      return exist;
     }
 
     const hashPassword = await bcrypt.hash(data.password, saltRounds);
@@ -34,33 +34,33 @@ export class AuthService {
   }
 
   async signinWithUsername(username: string, password: string) {
-    let user = null;
+    let result = null;
     let isPasswordCorrect = false;
 
-    user = await this.userService.getUserByusername(username);
-    if (!user) {
-      user = await this.userService.getUserByEmail(username);
-      if (!user)
-        throw new NotFoundException('user not found');
+    result = await this.userService.getUserByusername(username);
+    if (result === 'user not found') {
+      result = await this.userService.getUserByEmail(username);
+      if (result === 'user not found')
+        return 'user not found';
     }
 
-    isPasswordCorrect = await this.validatePassword(user, password);
+    isPasswordCorrect = await this.validatePassword(result, password);
     if (!isPasswordCorrect)
-      throw new UnauthorizedException('incorrect password');
+      return 'incorrect password';
 
-    return await this.createToken(JwtPayload.fromModel(user));
+    return await this.createToken(JwtPayload.fromModel(result));
   }
 
   async signinWithToken(token: string) {
     try {
       const data = this.jwtService.decode(token) as JwtPayload;
-      const user = await this.validate(data);
-      if (!user)
-        throw new UnauthorizedException();
-      const newToken = await this.createToken(JwtPayload.fromModel(user));
+      const result = await this.validate(data);
+      if (result === 'user not found')
+        return 'user not found';
+      const newToken = await this.createToken(JwtPayload.fromModel(result));
       return newToken;
     } catch (e) {
-      throw new BadRequestException('Token Error');
+      return 'token error';
     }
   }
 
@@ -82,12 +82,14 @@ export class AuthService {
     return await this.validate(payload);
   }
 
-  private async validate(payload: JwtPayload) {
+  async validate(payload: JwtPayload) {
     if (!payload) return false;
     return await this.userService.getUserByusername(payload.username);
   }
 
   private async validatePassword(user: User, password: string) {
+    if(!user || !password)
+      return false;
     return await bcrypt.compare(password, user.password);
   }
 

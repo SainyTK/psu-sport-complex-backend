@@ -15,7 +15,7 @@ export class Court extends Model<Court> {
     @AllowNull(false)
     @PrimaryKey
     @AutoIncrement
-    @Column({field: 'court_id'})
+    @Column
     courtId: number;
 
     @AllowNull(false)
@@ -24,7 +24,7 @@ export class Court extends Model<Court> {
 
     @ForeignKey(() => Stadium)
     @AllowNull(false)
-    @Column({field: 'stadium_id'})
+    @Column
     stadiumId: number;
 
     @BelongsTo(() => Stadium)

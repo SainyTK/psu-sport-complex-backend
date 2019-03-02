@@ -18,8 +18,12 @@ export class User extends Model<User> {
     @AllowNull(false)
     @PrimaryKey
     @AutoIncrement
-    @Column({field: 'user_id'})
+    @Column
     userId: number;
+
+    @AllowNull(false)
+    @Column
+    idNumber: string;
 
     @AllowNull(false)
     @Column
@@ -55,7 +59,7 @@ export class User extends Model<User> {
     gender: 'M'|'F';
 
     @AllowNull(false)
-    @Column({field: 'timezone_offset'})
+    @Column
     timezoneOffset: number;
 
     @AllowNull(false)
