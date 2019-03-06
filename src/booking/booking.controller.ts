@@ -90,7 +90,6 @@ export class BookingController {
   @UseInterceptors(FileInterceptor('file'))
   @Post('/upload_slip/:bookingId')
   async uploadSlip(@UploadedFile() slip, @Param('bookingId') bookingId, @Res() res) {
-    console.log(slip);
     const result = await this.bookingService.uploadSlip(bookingId, slip.filename);
     return res.json(result);
   }
