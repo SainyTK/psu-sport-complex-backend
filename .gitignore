@@ -1,3 +1,4 @@
 node_modules/
 uploads/
 src/config/db.config.ts
+dist/
