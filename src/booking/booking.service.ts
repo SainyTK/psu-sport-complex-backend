@@ -12,13 +12,22 @@ export class BookingService {
     @Inject('bookingRepo') private readonly booking: typeof Booking) { }
 
   async findAll() {
-    return await this.booking.findAll();
+    return await this.booking.findAll({
+      include: [Court, User]
+    });
   }
 
   async findById(bookingId: number) {
     return await this.booking.findOne({
       include: [Court, User],
       where: { bookingId }
+    });
+  }
+
+  async findByCourtId(courtId: number) {
+    return await this.booking.findAll({
+      include: [Court, User],
+      where: { courtId }
     });
   }
 
@@ -53,18 +62,20 @@ export class BookingService {
   async uploadSlip(bookingId: number, filename) {
     const booking = await this.booking.findByPk(bookingId);
     if (!booking)
-      return 'booking not found';
+      return { error: 'booking not found' };
 
     booking.slip = filename;
     booking.status = BOOKING_STATUS.PAID;
 
-    return await booking.update(booking);
+    const result = await this.booking.update({slip: filename, status: BOOKING_STATUS.PAID}, {where: {bookingId}});
+
+    return booking;
   }
 
   async approve(bookingId: number, isApprove: boolean) {
     const booking = await this.booking.findByPk(bookingId);
     if (!booking)
-      return 'booking not found'
+      return { error: 'booking not found' }
 
     booking.status = isApprove ? BOOKING_STATUS.APPROVED : BOOKING_STATUS.UNAPPROVED;
 
@@ -74,20 +85,21 @@ export class BookingService {
   async book(data: Booking) {
     const { startDate, endDate } = data;
     if (startDate > endDate)
-      return 'start date lead end date';
+      return { error: 'start date lead end date' };
 
-    const overlapBooking = await this.findOverlapBooking(startDate, endDate);
+    const overlapBooking = await this.findOverlapBooking(startDate, endDate, data.courtId);
     if (overlapBooking.length > 0)
-      return 'overlap booking';
+      return { error: 'overlap booking' };
 
     const booking = await this.booking.create(data);
-    return booking;
+    return this.findById(booking.bookingId);
   }
 
-  private async findOverlapBooking(startDate: Date, endDate: Date) {
+  private async findOverlapBooking(startDate: Date, endDate: Date, courtId: number) {
     const Op = Sequelize.Op;
     const bookings = await this.booking.findAll({
       where: {
+        courtId,
         [Op.or]: [
           {
             startDate: {

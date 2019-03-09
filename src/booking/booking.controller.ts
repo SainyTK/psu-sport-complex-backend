@@ -13,6 +13,7 @@ import {
   UseInterceptors,
   FileInterceptor,
   UploadedFile,
+  HttpStatus,
 } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { BookingDTO } from './dto/booking.dto';
@@ -32,7 +33,14 @@ export class BookingController {
   @Get('/all')
   async findAll(@Res() res) {
     const result = await this.bookingService.findAll();
-    return res.json(result);
+    return res.status(HttpStatus.OK).json(result);
+  }
+
+  @UseGuards(AuthGuard())
+  @Get('/court/:courtId')
+  async findByCourt(@Res() res, @Param('courtId') id) {
+    const result = await this.bookingService.findByCourtId(id);
+    return res.status(HttpStatus.OK).json(result);
   }
 
   @UseGuards(AuthGuard())
@@ -40,7 +48,7 @@ export class BookingController {
   @Get('/id/:bookingId')
   async findById(@Res() res, @Param('bookingId') id) {
     const result = await this.bookingService.findById(id);
-    return res.json(result);
+    return res.status(HttpStatus.OK).json(result);
   }
 
   @UseGuards(AuthGuard())
@@ -48,14 +56,14 @@ export class BookingController {
   @Get('/user/:userId')
   async findByUserId(@Res() res, @Param('userId') userId) {
     const result = await this.bookingService.findByUserId(userId);
-    return res.json(result);
+    return res.status(HttpStatus.OK).json(result);
   }
 
   @UseGuards(AuthGuard())
   @Get('/')
   async findCurrentWeek(@Res() res) {
     const result = await this.bookingService.findCurrentWeek();
-    return res.json(result);
+    return res.status(HttpStatus.OK).json(result);
   }
 
   @UseGuards(AuthGuard())
@@ -63,7 +71,7 @@ export class BookingController {
   @Post()
   async book(@Body() dto: BookingDTO, @Res() res) {
     const result = await this.bookingService.book(BookingDTO.toModel(dto));
-    return res.json(result);
+    return res.status(HttpStatus.OK).json(result);
   }
 
   @UseGuards(AuthGuard())
@@ -73,7 +81,7 @@ export class BookingController {
     await this.authService.checkAdminFromToken(extractToken(req));
 
     const result = await this.bookingService.approve(bookingId, true);
-    return res.json(result);
+    return res.status(HttpStatus.OK).json(result);
   }
 
   @UseGuards(AuthGuard())
@@ -83,7 +91,7 @@ export class BookingController {
     await this.authService.checkAdminFromToken(extractToken(req));
 
     const result = await this.bookingService.approve(bookingId, false);
-    return res.json(result);
+    return res.status(HttpStatus.OK).json(result);
   }
 
   // @UseGuards(AuthGuard())
@@ -91,7 +99,7 @@ export class BookingController {
   @Post('/upload_slip/:bookingId')
   async uploadSlip(@UploadedFile() slip, @Param('bookingId') bookingId, @Res() res) {
     const result = await this.bookingService.uploadSlip(bookingId, slip.filename);
-    return res.json(result);
+    return res.status(HttpStatus.OK).json(result);
   }
 
   @Get('/slip/:bookingId')
