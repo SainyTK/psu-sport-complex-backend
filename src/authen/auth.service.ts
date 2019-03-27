@@ -1,13 +1,11 @@
 import {
   Injectable,
-  NotFoundException,
   UnauthorizedException,
-  BadRequestException,
 } from '@nestjs/common';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interfaces/jwt.payload';
-import { User } from 'src/user/model/user.model';
+import { User } from '../user/model/user.model';
 import * as bcrypt from 'bcrypt';
 import { USER_POSITION } from '../user/constant/user-position';
 

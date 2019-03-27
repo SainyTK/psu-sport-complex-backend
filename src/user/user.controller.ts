@@ -10,8 +10,8 @@ import {
 import { UserService } from './user.service';
 import { User } from './model/user.model';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from 'src/authen/auth.service';
-import { extractToken } from 'src/common/utils/extract-token';
+import { AuthService } from '../authen/auth.service';
+import { extractToken } from '../common/utils/extract-token';
 
 
 @Controller('user')

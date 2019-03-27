@@ -1,4 +1,4 @@
-import { User } from 'src/user/model/user.model';
+import { User } from '../../user/model/user.model';
 import { IsString, IsNumber, IsDateString } from 'class-validator';
 
 export class SignupDTO {

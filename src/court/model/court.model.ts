@@ -8,7 +8,7 @@ import {
     ForeignKey,
     BelongsTo,
 } from 'sequelize-typescript';
-import { Stadium } from 'src/stadium/model/stadium.model';
+import { Stadium } from '../../stadium/model/stadium.model';
 
 @Table
 export class Court extends Model<Court> {

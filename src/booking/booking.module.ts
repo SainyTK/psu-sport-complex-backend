@@ -4,7 +4,7 @@ import { BookingService } from './booking.service';
 import { BookingProviders } from './booking.provider';
 import { DatabaseModule } from '../database/database.module';
 import { PassportModule } from '@nestjs/passport';
-import MulterConfigService from 'src/config/multerconfig.service';
+import MulterConfigService from '../config/multerconfig.service';
 
 @Module({
   imports: [

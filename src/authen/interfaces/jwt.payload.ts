@@ -1,4 +1,4 @@
-import { User } from 'src/user/model/user.model';
+import { User } from '../../user/model/user.model';
 
 export class JwtPayload {
     userId: number;

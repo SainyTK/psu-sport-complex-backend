@@ -17,10 +17,10 @@ import {
 } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { BookingDTO } from './dto/booking.dto';
-import { ValidationPipe } from 'src/common/validation.pipe';
+import { ValidationPipe } from '../common/validation.pipe';
 import { AuthGuard } from '@nestjs/passport';
-import { extractToken } from 'src/common/utils/extract-token';
-import { AuthService } from 'src/authen/auth.service';
+import { extractToken } from '../common/utils/extract-token';
+import { AuthService } from '../authen/auth.service';
 
 @Controller('booking')
 export class BookingController {

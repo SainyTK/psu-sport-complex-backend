@@ -9,8 +9,8 @@ import {
     BelongsTo,
     Default,
 } from 'sequelize-typescript';
-import { User } from 'src/user/model/user.model';
-import { Court } from 'src/court/model/court.model';
+import { User } from '../../user/model/user.model';
+import { Court } from '../../court/model/court.model';
 import { BOOKING_STATUS } from '../constant/booking-status';
 
 @Table({

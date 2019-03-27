@@ -1,9 +1,9 @@
-import { Injectable, Inject, BadRequestException } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { Booking } from './model/booking.model';
 import { Sequelize } from 'sequelize-typescript';
 import TimeUtils from '../common/utils/time-utils';
-import { User } from 'src/user/model/user.model';
-import { Court } from 'src/court/model/court.model';
+import { User } from '../user/model/user.model';
+import { Court } from '../court/model/court.model';
 import { BOOKING_STATUS } from './constant/booking-status';
 
 @Injectable()
