@@ -13,28 +13,32 @@ export class BookingService {
 
   async findAll() {
     return await this.booking.findAll({
-      include: [Court, User]
+      include: [Court, User],
+      order: ['startDate']
     });
   }
 
   async findById(bookingId: number) {
     return await this.booking.findOne({
       include: [Court, User],
-      where: { bookingId }
+      where: { bookingId },
+      order: ['startDate']
     });
   }
 
   async findByCourtId(courtId: number) {
     return await this.booking.findAll({
       include: [Court, User],
-      where: { courtId }
+      where: { courtId },
+      order: ['startDate']
     });
   }
 
   async findByUserId(userId: number) {
     return await this.booking.findAll({
       include: [Court, User],
-      where: { userId }
+      where: { userId },
+      order: ['startDate']
     });
   }
 
