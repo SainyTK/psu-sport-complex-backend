@@ -23,7 +23,7 @@ export class User extends Model<User> {
 
     @AllowNull(false)
     @Column
-    idNumber: string;
+    phoneNumber: string;
 
     @AllowNull(false)
     @Column

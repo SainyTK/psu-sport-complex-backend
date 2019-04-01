@@ -1,0 +1,50 @@
+[
+    {
+      "stadiumId": 1,
+      "name": "tennis",
+      "costPublic": 100,
+      "costMember": 50,
+      "costStudent": 20,
+      "costStaff": 30
+    },
+    {
+      "stadiumId": 2,
+      "name": "table tennis",
+      "costPublic": 40,
+      "costMember": 30,
+      "costStudent": 20,
+      "costStaff": 20
+    },
+    {
+      "stadiumId": 3,
+      "name": "swimming",
+      "costPublic": 80,
+      "costMember": 40,
+      "costStudent": 30,
+      "costStaff": 30
+    },
+    {
+      "stadiumId": 4,
+      "name": "basketball",
+      "costPublic": 70,
+      "costMember": 40,
+      "costStudent": 20,
+      "costStaff": 30
+    },
+    {
+      "stadiumId": 5,
+      "name": "volley ball",
+      "costPublic": 70,
+      "costMember": 40,
+      "costStudent": 20,
+      "costStaff": 30
+    },
+    {
+      "stadiumId": 6,
+      "name": "badminton",
+      "costPublic": 60,
+      "costMember": 60,
+      "costStudent": 50,
+      "costStaff": 50
+    }
+   ]

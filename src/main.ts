@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
-import * as cors from 'cors';
+import cors from 'cors';
 
 const PORT = process.env.PORT || 3001;
 
@@ -23,4 +23,5 @@ async function bootstrap() {
 
   await app.listen(PORT);
 }
+
 bootstrap();

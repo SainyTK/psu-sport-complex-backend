@@ -4,7 +4,7 @@ import { IsString, IsNumber, IsDateString } from 'class-validator';
 export class SignupDTO {
     @IsString() fname: string;
     @IsString() lname: string;
-    @IsString() idNumber: string;
+    @IsString() phoneNumber: string;
     @IsString() username: string;
     @IsString() email: string;
     @IsString() password: string;
@@ -17,7 +17,7 @@ export class SignupDTO {
         const user = {
             fname: dto.fname,
             lname: dto.lname,
-            idNumber: dto.idNumber,
+            phoneNumber: dto.phoneNumber,
             username: dto.username,
             email: dto.email,
             password: dto.password,

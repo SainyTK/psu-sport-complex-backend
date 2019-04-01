@@ -26,14 +26,13 @@ export class UserService {
     return user;
   }
 
-  async checkExistingUser({username, email, idNumber}: User) {
+  async checkExistingUser({username, email}: User) {
     let Op = sequelize.Op;
     let user = await this.user.findOne({
       where: {
         [Op.or]: [
           {username},
           {email},
-          {idNumber}
         ]
       }
     });
@@ -42,8 +41,6 @@ export class UserService {
         return 'username exist';
       else if(user.email === email)
         return 'email exist';
-      else if(user.idNumber === idNumber)
-        return 'idNumber exist';
     }
     return false;
   }
