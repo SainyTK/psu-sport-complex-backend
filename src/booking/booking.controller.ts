@@ -29,14 +29,12 @@ export class BookingController {
     private readonly authService: AuthService
   ) { }
 
-  @UseGuards(AuthGuard())
   @Get('/all')
   async findAll(@Res() res) {
     const result = await this.bookingService.findAll();
     return res.status(HttpStatus.OK).json(result);
   }
 
-  @UseGuards(AuthGuard())
   @Get('/court/:courtId')
   async findByCourt(@Res() res, @Param('courtId') id) {
     const result = await this.bookingService.findByCourtId(id);
