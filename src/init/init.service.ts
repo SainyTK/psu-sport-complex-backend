@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
-import * as courtData from '../../seedData/court.json';
-import * as stadiumData from '../../seedData/stadium.json';
+import * as courtData from '../seedData/court.json';
+import * as stadiumData from '../seedData/stadium.json';
 import { CourtService } from '../court/court.service';
 import { StadiumService } from '../stadium/stadium.service';
 import { Stadium } from '../stadium/model/stadium.model';
