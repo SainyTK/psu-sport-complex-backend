@@ -122,4 +122,10 @@ export class BookingService {
     });
     return bookings;
   }
+
+  async deleteById(bookingId: number) {
+    const booking = await this.booking.findByPk(bookingId);
+    await booking.destroy()
+    return 'delete success';
+  }
 }

@@ -8,6 +8,7 @@ import { JwtPayload } from './interfaces/jwt.payload';
 import { User } from '../user/model/user.model';
 import * as bcrypt from 'bcrypt';
 import { USER_POSITION } from '../user/constant/user-position';
+import { Booking } from 'src/booking/model/booking.model';
 
 const saltRounds = 10;
 
@@ -72,6 +73,13 @@ export class AuthService {
   async checkAdminFromToken(accessToken: string) {
     const isAdmin = await this.checkPositionFromToken(accessToken, USER_POSITION.ADMIN);
     if (!isAdmin)
+      throw new UnauthorizedException('permission denied');
+  }
+
+  async checkOwnerFromToken(accessToken: string, booking: Booking) {
+    const user = await this.validateToken(accessToken) as User;
+    const isOwner = user.userId === booking.owner.userId;
+    if (!isOwner)
       throw new UnauthorizedException('permission denied');
   }
 

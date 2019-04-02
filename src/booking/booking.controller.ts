@@ -14,6 +14,7 @@ import {
   FileInterceptor,
   UploadedFile,
   HttpStatus,
+  Delete,
 } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { BookingDTO } from './dto/booking.dto';
@@ -89,6 +90,19 @@ export class BookingController {
     await this.authService.checkAdminFromToken(extractToken(req));
 
     const result = await this.bookingService.approve(bookingId, false);
+    return res.status(HttpStatus.OK).json(result);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Delete('/id/:bookingId')
+  async deleteById(@Param('bookingId') bookingId,@Req() req, @Res() res) {
+    const booking = await this.bookingService.findById(bookingId);
+    if (!booking)
+      return res.status(HttpStatus.OK).json({error: 'Booking not found'})
+
+    await this.authService.checkOwnerFromToken(extractToken(req), bookingId);
+    const result = await this.bookingService.deleteById(bookingId);
+
     return res.status(HttpStatus.OK).json(result);
   }
 
