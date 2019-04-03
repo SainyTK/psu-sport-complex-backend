@@ -78,7 +78,7 @@ export class AuthService {
 
   async checkOwnerFromToken(accessToken: string, booking: Booking) {
     const user = await this.validateToken(accessToken) as User;
-    const isOwner = user.userId === booking.owner.userId;
+    const isOwner = user.userId === booking.userId;
     if (!isOwner)
       throw new UnauthorizedException('permission denied');
   }

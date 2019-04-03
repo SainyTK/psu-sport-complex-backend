@@ -100,7 +100,7 @@ export class BookingController {
     if (!booking)
       return res.status(HttpStatus.OK).json({error: 'Booking not found'})
 
-    await this.authService.checkOwnerFromToken(extractToken(req), bookingId);
+    await this.authService.checkOwnerFromToken(extractToken(req), booking);
     const result = await this.bookingService.deleteById(bookingId);
 
     return res.status(HttpStatus.OK).json(result);
