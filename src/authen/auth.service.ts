@@ -32,14 +32,12 @@ export class AuthService {
     return data;
   }
 
-  async signinWithUsername(username: string, password: string) {
+  async signinWithPhoneNumber(phoneNumber: string, password: string) {
     let result = null;
     let isPasswordCorrect = false;
 
-    result = await this.userService.getUserByusername(username);
+    result = await this.userService.getUserByPhoneNumber(phoneNumber);
     if (result === 'user not found') {
-      result = await this.userService.getUserByEmail(username);
-      if (result === 'user not found')
         return 'user not found';
     }
 
@@ -90,7 +88,7 @@ export class AuthService {
 
   async validate(payload: JwtPayload) {
     if (!payload) return false;
-    return await this.userService.getUserByusername(payload.username);
+    return await this.userService.getUserByPhoneNumber(payload.phoneNumber);
   }
 
   private async validatePassword(user: User, password: string) {

@@ -5,6 +5,7 @@ import { BookingProviders } from './booking.provider';
 import { DatabaseModule } from '../database/database.module';
 import { PassportModule } from '@nestjs/passport';
 import MulterConfigService from '../config/multerconfig.service';
+import { StadiumModule } from '../stadium/stadium.module';
 
 @Module({
   imports: [
@@ -12,7 +13,8 @@ import MulterConfigService from '../config/multerconfig.service';
     MulterModule.registerAsync({
       useClass: MulterConfigService
     }),
-    DatabaseModule
+    DatabaseModule,
+    StadiumModule
   ],
   exports: [BookingService],
   controllers: [BookingController],

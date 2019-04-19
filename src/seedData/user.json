@@ -1,0 +1,12 @@
+[
+    {
+        "fname": "test user",
+        "lname": "test ts",
+        "password": "0123456789",
+        "dob": "2019-02-26T18:26:46.495Z",
+        "gender": "M",
+        "timezoneOffset": 5,
+        "language": "en-US",
+        "phoneNumber": "0123456789"
+    }
+]

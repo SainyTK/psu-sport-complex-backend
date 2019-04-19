@@ -4,6 +4,7 @@ import {
   Res,
   Post,
   Body,
+  Param,
 } from '@nestjs/common';
 import { StadiumService } from './stadium.service';
 
@@ -11,10 +12,16 @@ import { StadiumService } from './stadium.service';
 export class StadiumController {
   constructor(private readonly stadiumService: StadiumService) { }
 
-  @Get()
+  @Get('/all')
   async findAll(@Res() res) {
     const stadiums = await this.stadiumService.findAll();
     return res.json(stadiums);
+  }
+
+  @Get('/:stadiumId')
+  async findById(@Param('stadiumId') id,@Res() res) {
+    const stadium = await this.stadiumService.findById(id);
+    return res.json(stadium);
   }
 
   @Post()

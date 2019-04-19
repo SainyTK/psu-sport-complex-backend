@@ -5,8 +5,6 @@ export class SignupDTO {
     @IsString() fname: string;
     @IsString() lname: string;
     @IsString() phoneNumber: string;
-    @IsString() username: string;
-    @IsString() email: string;
     @IsString() password: string;
     @IsDateString() dob: Date;
     @IsString() gender: 'M'|'F';
@@ -18,8 +16,6 @@ export class SignupDTO {
             fname: dto.fname,
             lname: dto.lname,
             phoneNumber: dto.phoneNumber,
-            username: dto.username,
-            email: dto.email,
             password: dto.password,
             dob: dto.dob,
             gender: dto.gender,

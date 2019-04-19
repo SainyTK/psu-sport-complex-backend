@@ -36,9 +36,9 @@ export class BookingController {
     return res.status(HttpStatus.OK).json(result);
   }
 
-  @Get('/court/:courtId')
-  async findByCourt(@Res() res, @Param('courtId') id) {
-    const result = await this.bookingService.findByCourtId(id);
+  @Get('/stadium/:stadiumId')
+  async findByStadium(@Res() res, @Param('stadiumId') id) {
+    const result = await this.bookingService.findByStadiumId(id);
     return res.status(HttpStatus.OK).json(result);
   }
 

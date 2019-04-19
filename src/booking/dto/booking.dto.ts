@@ -8,6 +8,8 @@ export class BookingDTO {
 
     @IsInt() readonly userId: number;
 
+    @IsInt() readonly stadiumId: number;
+
     @IsInt() readonly courtId: number;
 
     @IsDateString() readonly startDate: Date;
@@ -19,6 +21,7 @@ export class BookingDTO {
             title: dto.title,
             description: dto.description,
             userId: dto.userId,
+            stadiumId: dto.stadiumId,
             courtId: dto.courtId,
             startDate: dto.startDate,
             endDate: dto.endDate,

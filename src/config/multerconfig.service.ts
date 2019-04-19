@@ -12,7 +12,7 @@ class MulterConfigService implements MulterOptionsFactory {
         return {
             storage: multer.diskStorage({
                 destination: (req, file, cb) => {
-                    cb(null, '../uploads/')
+                    cb(null, `${__dirname}/../../uploads/`)
                 },
                 filename: (req, file, cb) => {
                     cb(null, newName + '-' + Date.now() + '.jpg')

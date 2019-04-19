@@ -12,7 +12,7 @@ export class InitController {
 
   @Get()
   async initializeData(@Res() res) {
-    await this.initService.initData();
-    return res.status(HttpStatus.OK).json('Initialize successful');
+    const result = await this.initService.initData();
+    return res.status(HttpStatus.OK).json(result);
   }
 }

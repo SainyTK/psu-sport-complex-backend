@@ -3,40 +3,43 @@ import { Booking } from './model/booking.model';
 import { Sequelize } from 'sequelize-typescript';
 import TimeUtils from '../common/utils/time-utils';
 import { User } from '../user/model/user.model';
-import { Court } from '../court/model/court.model';
 import { BOOKING_STATUS } from './constant/booking-status';
+import { Stadium } from '../stadium/model/stadium.model';
+import { StadiumService } from '../stadium/stadium.service';
 
 @Injectable()
 export class BookingService {
   constructor(
-    @Inject('bookingRepo') private readonly booking: typeof Booking) { }
+    @Inject('bookingRepo') private readonly booking: typeof Booking,
+    private readonly stadiumService: StadiumService
+  ) { }
 
   async findAll() {
     return await this.booking.findAll({
-      include: [Court, User],
+      include: [Stadium, User],
       order: ['startDate']
     });
   }
 
   async findById(bookingId: number) {
     return await this.booking.findOne({
-      include: [Court, User],
+      include: [Stadium, User],
       where: { bookingId },
       order: ['startDate']
     });
   }
 
-  async findByCourtId(courtId: number) {
-    return await this.booking.findAll({
-      include: [Court, User],
-      where: { courtId },
-      order: ['startDate']
+  async findByStadiumId(stadiumId: number) {
+    const bookings = await this.booking.findAll({
+      include: [Stadium, User],
+      where: {stadiumId}
     });
+    return bookings;
   }
 
   async findByUserId(userId: number) {
     return await this.booking.findAll({
-      include: [Court, User],
+      include: [Stadium, User],
       where: { userId },
       order: ['startDate']
     });
@@ -48,7 +51,7 @@ export class BookingService {
     const dayNextWeekZOclock = TimeUtils.zeroOclock(TimeUtils.nextXDate(new Date(), 7));
 
     const bookings = await this.booking.findAll({
-      include: [User, Court],
+      include: [User, Stadium],
       where: {
         endDate: {
           [Op.between]: [
@@ -87,23 +90,30 @@ export class BookingService {
   }
 
   async book(data: Booking) {
-    const { startDate, endDate } = data;
+    const { startDate, endDate, stadiumId, courtId } = data;
     if (startDate > endDate)
       return { error: 'start date lead end date' };
 
-    const overlapBooking = await this.findOverlapBooking(startDate, endDate, data.courtId);
+    const overlapBooking = await this.findOverlapBooking(startDate, endDate, data);
     if (overlapBooking.length > 0)
       return { error: 'overlap booking' };
+
+    const stadium = await this.stadiumService.findById(stadiumId);
+    if (!stadium)
+      return { error: `Stadium doesn't exist`};
+    else if(courtId > stadium.numCourt || courtId <= 0)
+      return { error: `Court doens't exist`};
 
     const booking = await this.booking.create(data);
     return this.findById(booking.bookingId);
   }
 
-  private async findOverlapBooking(startDate: Date, endDate: Date, courtId: number) {
+  private async findOverlapBooking(startDate: Date, endDate: Date, booking: Booking) {
     const Op = Sequelize.Op;
     const bookings = await this.booking.findAll({
       where: {
-        courtId,
+        stadiumId: booking.stadiumId,
+        courtId: booking.courtId,
         [Op.or]: [
           {
             startDate: {

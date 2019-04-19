@@ -6,6 +6,7 @@ import {
   Body,
   UseGuards,
   Req,
+  Param,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './model/user.model';
@@ -22,24 +23,24 @@ export class UserController {
   ) { }
 
   @UseGuards(AuthGuard())
-  @Patch('/upgrade')
-  async upgradeUser(@Body('username') username: string, @Req() req, @Res() res) {
+  @Patch('/upgrade/:userId')
+  async upgradeUser(@Body('position') position: string,@Param('userId') userId: number, @Req() req, @Res() res) {
     await this.authService.checkAdminFromToken(extractToken(req));
-    const result = await this.userService.upgradeUser(username);
+    const result = await this.userService.upgradeUser(userId, position);
     return res.json({result});
   }
 
   @UseGuards(AuthGuard())
   @Patch()
-  async updateUser(@Body('user') data: User, @Body('username') username: string, @Res() res) {
-    const user = await this.userService.updateUser(username, data);
+  async updateUser(@Body('user') data: User, @Body('phoneNumber') phoneNumber: string, @Res() res) {
+    const user = await this.userService.updateUser(phoneNumber, data);
     return res.json(user);
   }
 
   @UseGuards(AuthGuard())
   @Delete()
-  async deleteUser(@Body('username') username: string, @Res() res) {
-    await this.userService.deleteUser(username);
+  async deleteUser(@Body('phoneNumber') phoneNumber: string, @Res() res) {
+    await this.userService.deleteUser(phoneNumber);
     return res.json({ message: 'delete success' });
   }
 

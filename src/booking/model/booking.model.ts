@@ -10,8 +10,8 @@ import {
     Default,
 } from 'sequelize-typescript';
 import { User } from '../../user/model/user.model';
-import { Court } from '../../court/model/court.model';
 import { BOOKING_STATUS } from '../constant/booking-status';
+import { Stadium } from 'src/stadium/model/stadium.model';
 
 @Table({
     timestamps: true,
@@ -45,13 +45,17 @@ export class Booking extends Model<Booking> {
     @BelongsTo(() => User)
     owner: User;
 
-    @ForeignKey(() => Court)
+    @ForeignKey(() => Stadium)
+    @AllowNull(false)
+    @Column
+    stadiumId: number;
+
+    @BelongsTo(() => Stadium)
+    stadium: Stadium;
+
     @AllowNull(false)
     @Column
     courtId: number;
-
-    @BelongsTo(() => Court)
-    court: Court;
 
     @AllowNull(false)
     @Column

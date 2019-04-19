@@ -9,6 +9,11 @@ export class StadiumService {
     return await this.stadium.findAll();
   }
 
+  async findById(stadiumId: number) {
+    const stadium = await this.stadium.findById(stadiumId);
+    return stadium;
+  }
+
   async insert(stadium: Stadium) {
     return await this.stadium.create(stadium);
   }

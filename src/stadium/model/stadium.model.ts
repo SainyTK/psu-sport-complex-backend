@@ -21,6 +21,10 @@ export class Stadium extends Model<Stadium> {
 
     @AllowNull(false)
     @Column
+    numCourt: number;
+
+    @AllowNull(false)
+    @Column
     costPublic: number;
 
     @AllowNull(false)
