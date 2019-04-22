@@ -75,6 +75,15 @@ export class BookingController {
 
   @UseGuards(AuthGuard())
   @UsePipes(new ValidationPipe())
+  @Post('/many')
+  async bookMany(@Body() dtos: BookingDTO[], @Res() res) {
+    const bookingModels = dtos.map(dto => (BookingDTO.toModel(dto)));
+    const result = await this.bookingService.bookMany(bookingModels);
+    return res.status(HttpStatus.OK).json(result);
+  }
+
+  @UseGuards(AuthGuard())
+  @UsePipes(new ValidationPipe())
   @Patch('/approve/:bookingId')
   async approve(@Param('bookingId') bookingId, @Req() req, @Res() res) {
     await this.authService.checkAdminFromToken(extractToken(req));
@@ -94,7 +103,7 @@ export class BookingController {
   }
 
   @UsePipes(new ValidationPipe())
-  @Delete('/id/:bookingId')
+  @Delete('/:bookingId')
   async deleteById(@Param('bookingId') bookingId,@Req() req, @Res() res) {
     const booking = await this.bookingService.findById(bookingId);
     if (!booking)
@@ -106,22 +115,17 @@ export class BookingController {
     return res.status(HttpStatus.OK).json(result);
   }
 
-  // @UseGuards(AuthGuard())
-  @UseInterceptors(FileInterceptor('file'))
-  @Post('/upload_slip/:bookingId')
-  async uploadSlip(@UploadedFile() slip, @Param('bookingId') bookingId, @Res() res) {
-    const result = await this.bookingService.uploadSlip(bookingId, slip.filename);
+  @UsePipes(new ValidationPipe())
+  @Delete('/bill/:billId')
+  async deleteByBillId(@Param('billId') billId,@Req() req, @Res() res) {
+    const bookings = await this.bookingService.findByBillId(billId);
+    if (!bookings || bookings.length === 0)
+      return res.status(HttpStatus.OK).json({error: 'Booking not found'})
+
+    await this.authService.checkOwnerFromToken(extractToken(req), bookings[0]);
+    const result = await this.bookingService.deleteByBillId(billId);
+
     return res.status(HttpStatus.OK).json(result);
   }
 
-  @Get('/slip/:bookingId')
-  async getSlip(@Param('bookingId') path, @Res() res) {
-    let response = {};
-    try {
-      response = res.sendFile(path, { root: 'uploads' });
-    } catch (e) {
-      response = 'error'
-    }
-    return response;
-  }
 }

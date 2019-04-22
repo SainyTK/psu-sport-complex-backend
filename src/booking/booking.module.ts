@@ -1,4 +1,4 @@
-import { Module, MulterModule } from '@nestjs/common';
+import { Module, MulterModule, Global } from '@nestjs/common';
 import { BookingController } from './booking.controller';
 import { BookingService } from './booking.service';
 import { BookingProviders } from './booking.provider';
@@ -6,7 +6,9 @@ import { DatabaseModule } from '../database/database.module';
 import { PassportModule } from '@nestjs/passport';
 import MulterConfigService from '../config/multerconfig.service';
 import { StadiumModule } from '../stadium/stadium.module';
+import { BillModule } from '../bill/bill.module';
 
+@Global()
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
@@ -14,7 +16,8 @@ import { StadiumModule } from '../stadium/stadium.module';
       useClass: MulterConfigService
     }),
     DatabaseModule,
-    StadiumModule
+    StadiumModule,
+    BillModule
   ],
   exports: [BookingService],
   controllers: [BookingController],

@@ -3,6 +3,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './authen/auth.module';
 import { StadiumModule } from './stadium/stadium.module';
 import { BookingModule } from './booking/booking.module';
+import { BillModule } from './bill/bill.module';
 import { InitModule } from './init/init.module';
 
 @Module({
@@ -11,7 +12,8 @@ import { InitModule } from './init/init.module';
     UserModule,
     AuthModule,
     StadiumModule,
-    BookingModule
+    BookingModule,
+    BillModule
   ],
   controllers: [],
   providers: [],

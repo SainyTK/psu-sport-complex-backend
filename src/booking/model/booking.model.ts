@@ -11,7 +11,8 @@ import {
 } from 'sequelize-typescript';
 import { User } from '../../user/model/user.model';
 import { BOOKING_STATUS } from '../constant/booking-status';
-import { Stadium } from 'src/stadium/model/stadium.model';
+import { Stadium } from '../../stadium/model/stadium.model';
+import { Bill } from '../../bill/model/bill.model';
 
 @Table({
     timestamps: true,
@@ -45,6 +46,14 @@ export class Booking extends Model<Booking> {
     @BelongsTo(() => User)
     owner: User;
 
+    @ForeignKey(() => Bill)
+    @AllowNull(true)
+    @Column
+    billId: number;
+
+    @BelongsTo(() => Bill)
+    bill: Bill;
+
     @ForeignKey(() => Stadium)
     @AllowNull(false)
     @Column
@@ -64,8 +73,4 @@ export class Booking extends Model<Booking> {
     @AllowNull(false)
     @Column
     endDate: Date;
-
-    @Default('')
-    @Column
-    slip: string;
 }
