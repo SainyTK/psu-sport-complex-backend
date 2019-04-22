@@ -10,6 +10,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { BillService } from './bill.service';
+import MulterConfigService from '../config/multerconfig.service';
 
 @Controller('bill')
 export class BillController {
@@ -23,7 +24,7 @@ export class BillController {
     return res.status(HttpStatus.OK).json(result);
   }
 
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file'), MulterConfigService)
   @Post('/upload_slip/:billId')
   async uploadSlip(@UploadedFile() slip, @Param('billId') billId, @Res() res) {
     const result = await this.billService.updateSlip(billId, slip.filename);
@@ -39,6 +40,13 @@ export class BillController {
       response = 'error'
     }
     return response;
+  }
+
+  @UseInterceptors(FileInterceptor('file'))
+  @Post('/upload')
+  async testUpload(@UploadedFile() f, @Res() res) {
+    console.log(f.filename);
+    return res.status(HttpStatus.OK).json({message: 'OK'})
   }
 
 }
