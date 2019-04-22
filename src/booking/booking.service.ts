@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { Booking } from './model/booking.model';
 import { Sequelize } from 'sequelize-typescript';
 import TimeUtils from '../common/utils/time-utils';
@@ -15,7 +15,7 @@ export class BookingService {
   constructor(
     @Inject('bookingRepo') private readonly booking: typeof Booking,
     private readonly stadiumService: StadiumService,
-    private readonly billService: BillService
+    @Inject(forwardRef(() => BillService)) private readonly billService: BillService
   ) { }
 
   async findAll() {
