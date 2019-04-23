@@ -51,7 +51,7 @@ export class UserService {
         user.position = USER_POSITION.ADMIN;
         break;
     }
-    return await user.update(user);
+    return await this.user.update({position: user.position}, {where: {userId}});
   }
 
   async deleteUser(phoneNumber: string) {
