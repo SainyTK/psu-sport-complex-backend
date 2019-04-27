@@ -9,6 +9,8 @@ import {
 } from 'sequelize-typescript';
 import { USER_POSITION } from '../constant/user-position';
 
+const { GENERAL_PUBLIC } = USER_POSITION;
+
 @Table({
     timestamps: true,
     paranoid: true,
@@ -25,6 +27,14 @@ export class User extends Model<User> {
     @Column
     phoneNumber: string;
 
+    @AllowNull(true)
+    @Column
+    psuPassport: string;
+
+    @AllowNull(false)
+    @Column
+    email: string;
+
     @AllowNull(false)
     @Column
     fname: string;
@@ -38,7 +48,7 @@ export class User extends Model<User> {
     password: string;
 
     @AllowNull(false)
-    @Default(USER_POSITION.GENERAL_PUBLIC)
+    @Default(GENERAL_PUBLIC)
     @Column
     position: string;
 
@@ -48,13 +58,5 @@ export class User extends Model<User> {
 
     @AllowNull(false)
     @Column
-    gender: 'M'|'F';
-
-    @AllowNull(false)
-    @Column
-    timezoneOffset: number;
-
-    @AllowNull(false)
-    @Column
-    language: string;
+    gender: 'M' | 'F';
 }

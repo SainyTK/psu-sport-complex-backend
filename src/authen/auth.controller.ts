@@ -21,12 +21,20 @@ export class AuthController {
     return res.status(HttpStatus.OK).json(result);
   } 
 
+  // @Post('/signin')
+  // @UsePipes(new ValidationPipe())
+  // async signinWithPhoneNumber(@Body('phoneNumber') phoneNumber: string, @Body('password') password: string, @Res() res) {
+  //   const result = await this.authService.signinWithPhoneNumber(phoneNumber, password);
+  //   return res.status(HttpStatus.OK).json(result);
+  // }
+
   @Post('/signin')
   @UsePipes(new ValidationPipe())
-  async signinWithPhoneNumber(@Body('phoneNumber') phoneNumber: string, @Body('password') password: string, @Res() res) {
-    const result = await this.authService.signinWithPhoneNumber(phoneNumber, password);
+  async signin(@Body('signInfo') signInfo: string, @Body('password') password: string, @Res() res) {
+    const result = await this.authService.signin(signInfo, password);
     return res.status(HttpStatus.OK).json(result);
   }
+
 
   @Post('/sign_token')
   @UsePipes(new ValidationPipe())

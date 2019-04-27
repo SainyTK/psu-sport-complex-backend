@@ -9,8 +9,15 @@ import { User } from '../user/model/user.model';
 import * as bcrypt from 'bcrypt';
 import { USER_POSITION } from '../user/constant/user-position';
 import { Booking } from 'src/booking/model/booking.model';
+import * as soap from 'soap';
 
 const saltRounds = 10;
+const PSU_URL = 'https://passport.psu.ac.th/authentication/authentication.asmx?wsdl';
+
+enum SIGNIN_TYPE {
+  PHONE_NUMBER,
+  PSU_PASSPORT
+}
 
 @Injectable()
 export class AuthService {
@@ -32,13 +39,24 @@ export class AuthService {
     return data;
   }
 
+  async signin(signInfo: string, password: string) {
+    const signinType = this.checkSignInType(signInfo);
+
+    switch (signinType) {
+      case SIGNIN_TYPE.PHONE_NUMBER:
+        return await this.signinWithPhoneNumber(signInfo, password);
+      case SIGNIN_TYPE.PSU_PASSPORT:
+        return await this.signinWithPSUPassport(signInfo, password);
+    }
+  }
+
   async signinWithPhoneNumber(phoneNumber: string, password: string) {
     let result = null;
     let isPasswordCorrect = false;
 
     result = await this.userService.getUserByPhoneNumber(phoneNumber);
     if (result === 'user not found') {
-        return 'user not found';
+      return 'user not found';
     }
 
     isPasswordCorrect = await this.validatePassword(result, password);
@@ -46,6 +64,17 @@ export class AuthService {
       return 'incorrect password';
 
     return await this.createToken(JwtPayload.fromModel(result));
+  }
+
+  async signinWithPSUPassport(psuPassport: string, password: string) {
+
+    console.log('psuPassport', psuPassport);
+    console.log('password', password);
+    const result = await this.getPSUInfo(psuPassport, password);
+
+    console.log(result);
+
+    return 'OK';
   }
 
   async signinWithToken(token: string) {
@@ -92,7 +121,7 @@ export class AuthService {
   }
 
   private async validatePassword(user: User, password: string) {
-    if(!user || !password)
+    if (!user || !password)
       return false;
     return await bcrypt.compare(password, user.password);
   }
@@ -103,5 +132,28 @@ export class AuthService {
       expiresIn: 3600 * 24 * 3,
       accessToken
     }
+  }
+
+  private async getPSUInfo(psuPassport: string, password: string): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      soap.createClient(PSU_URL, (err, client) => {
+        if (err) return reject(err);
+
+        let user = {
+          name: psuPassport,
+          password: password
+        }
+
+        client.GetStudentDetails(user, (err, response) => {
+          if (err) return reject(err);
+          else
+            return resolve(response);
+        })
+      })
+    })
+  }
+
+  private checkSignInType(userInfo: string) {
+    return userInfo.startsWith('0') ? SIGNIN_TYPE.PHONE_NUMBER : SIGNIN_TYPE.PSU_PASSPORT;
   }
 }
