@@ -2,14 +2,18 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import nodemailer from 'nodemailer';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interfaces/jwt.payload';
 import { User } from '../user/model/user.model';
-import * as bcrypt from 'bcrypt';
 import { USER_POSITION } from '../user/constant/user-position';
-import { Booking } from 'src/booking/model/booking.model';
+import { Booking } from '../booking/model/booking.model';
 import * as soap from 'soap';
+import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
+import to from 'await-to-js';
+import { emailAddress, emailPassword, getPasswordResetText } from '../config/mail.config';
 
 const saltRounds = 10;
 const PSU_URL = 'https://passport.psu.ac.th/authentication/authentication.asmx?wsdl';
@@ -57,13 +61,13 @@ export class AuthService {
     let isPasswordCorrect = false;
 
     result = await this.userService.getUserByPhoneNumber(phoneNumber);
-    if (result === 'user not found') {
-      return 'user not found';
+    if (result.error) {
+      return result;
     }
 
     isPasswordCorrect = await this.validatePassword(result, password);
     if (!isPasswordCorrect)
-      return 'incorrect password';
+      return { error: 'incorrect password' };
 
     return await this.createToken(JwtPayload.fromModel(result));
   }
@@ -74,7 +78,7 @@ export class AuthService {
     if (result) {
       const isPasswordCorrect = await this.validatePassword(result, password);
       if (!isPasswordCorrect)
-        return 'incorrect password';
+        return { error: 'incorrect password' };
 
       return await this.createToken(JwtPayload.fromModel(result));
     }
@@ -83,7 +87,7 @@ export class AuthService {
     const { fname, lname } = this.extractPSUInfo(info);
 
     if (fname.length <= 0)
-      return 'user not found';
+      return { error: 'user not found' };
 
     const user = {
       fname,
@@ -106,12 +110,12 @@ export class AuthService {
     try {
       const data = this.jwtService.decode(token) as JwtPayload;
       const result = await this.validate(data);
-      if (result === 'user not found')
-        return 'user not found';
+      if (result.error)
+        return result;
       const newToken = await this.createToken(JwtPayload.fromModel(result));
       return newToken;
     } catch (e) {
-      return 'token error';
+      return { error: 'token error' };
     }
   }
 
@@ -135,13 +139,52 @@ export class AuthService {
       throw new UnauthorizedException('permission denied');
   }
 
+  async forgetPassword(phoneNumber: string) {
+    const result = await this.userService.getUserByPhoneNumber(phoneNumber);
+    if (result.error)
+      return result;
+
+    const user = result as User;
+    const token = crypto.randomBytes(20).toString('hex');
+    user.update({
+      resetPasswordToken: token,
+      resetPasswordExpires: Date.now() + (360000)
+    })
+
+    const [err] = await to(this.sentResetPasswordLink(user, token));
+
+    if (err)
+      return { error: err }
+
+    return `Already send reset mail to ${user.email}`;
+  }
+
+  async resetPassword(resetPasswordToken: string, password: string) {
+    const result = await this.userService.getUserByResetToken(resetPasswordToken);
+
+    if (result.error) return result;
+
+    const hashPassword = await bcrypt.hash(password, saltRounds);
+
+    const user = {
+      phoneNumber: result.phoneNumber,
+      password: hashPassword,
+      resetPasswordToken: null,
+      resetPasswordExpires: null
+    } as User;
+
+    await this.userService.updateUser(user);
+
+    return 'Password reset successful';
+  }
+
   async validateToken(accessToken: string) {
     const payload = this.jwtService.decode(accessToken) as JwtPayload;
     return await this.validate(payload);
   }
 
-  async validate(payload: JwtPayload) {
-    if (!payload) return false;
+  async validate(payload: JwtPayload): Promise<any> {
+    if (!payload) return { error: 'Invalid token' };
     return await this.userService.getUserByPhoneNumber(payload.phoneNumber);
   }
 
@@ -157,6 +200,29 @@ export class AuthService {
       expiresIn: 3600 * 24 * 3,
       accessToken
     }
+  }
+
+  private async sentResetPasswordLink(user, token) {
+    return new Promise<any>((resolve, reject) => {
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: emailAddress,
+          pass: emailPassword
+        }
+      });
+
+      const mailOptions = {
+        from: emailAddress,
+        to: user.email,
+        subject: 'Reset password link',
+        text: getPasswordResetText(token),
+      }
+      transporter.sendMail(mailOptions, (err, res) => {
+        if(err) return reject(err);
+        return resolve(res)
+      })
+    })
   }
 
   private async getPSUInfo(psuPassport: string, password: string): Promise<any> {

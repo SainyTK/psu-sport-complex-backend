@@ -7,6 +7,8 @@ import {
   UseGuards,
   Req,
   Param,
+  Get,
+  Post
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './model/user.model';
@@ -22,6 +24,18 @@ export class UserController {
     private readonly authService: AuthService
   ) { }
 
+  @Get('/')
+  async getAllUser(@Res() res) {
+    const users = await this.userService.getAllUsers();
+    return res.json(users);
+  }
+
+  @Get('/reset/:resetToken')
+  async getUserByResetToken(@Param('resetToken') resetToken: string, @Res() res) {
+    const result = await this.userService.getUserByResetToken(resetToken);
+    return res.json(result);
+  }
+
   @UseGuards(AuthGuard())
   @Patch('/upgrade/:userId')
   async upgradeUser(@Body('position') position: string,@Param('userId') userId: number, @Req() req, @Res() res) {
@@ -32,8 +46,8 @@ export class UserController {
 
   @UseGuards(AuthGuard())
   @Patch()
-  async updateUser(@Body('user') data: User, @Body('phoneNumber') phoneNumber: string, @Res() res) {
-    const user = await this.userService.updateUser(phoneNumber, data);
+  async updateUser(@Body('user') data: User, @Res() res) {
+    const user = await this.userService.updateUser(data);
     return res.json(user);
   }
 

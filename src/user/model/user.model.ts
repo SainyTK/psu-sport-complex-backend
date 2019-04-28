@@ -59,4 +59,14 @@ export class User extends Model<User> {
     @AllowNull(false)
     @Column
     gender: 'M' | 'F';
+
+    @AllowNull(true)
+    @Default(null)
+    @Column
+    resetPasswordToken: string;
+
+    @AllowNull(true)
+    @Default(null)
+    @Column
+    resetPasswordExpires: Date;
 }

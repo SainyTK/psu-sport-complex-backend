@@ -1,6 +1,8 @@
 import {
   Controller,
   Post,
+  Patch,
+  Param,
   Res,
   Body,
   UsePipes,
@@ -28,11 +30,23 @@ export class AuthController {
     return res.status(HttpStatus.OK).json(result);
   }
 
-
   @Post('/sign_token')
   @UsePipes(new ValidationPipe())
   async signWithToken(@Body('accessToken') token: string, @Res() res) {
     const result = await this.authService.signinWithToken(token);
+    return res.status(HttpStatus.OK).json(result);
+  }
+
+  @Post('/forget_password')
+  @UsePipes(new ValidationPipe())
+  async forgetPassword(@Body('phoneNumber') phoneNumber: string, @Res() res) {
+    const result = await this.authService.forgetPassword(phoneNumber);
+    return res.status(HttpStatus.OK).json(result);
+  }
+
+  @Patch('/reset/:resetToken')
+  async resetPassword(@Param('resetToken') resetToken, @Body('password') password, @Res() res) {
+    const result = await this.authService.resetPassword(resetToken, password);
     return res.status(HttpStatus.OK).json(result);
   }
 

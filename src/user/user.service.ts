@@ -7,10 +7,30 @@ export class UserService {
 
   constructor(@Inject('userRepo') private readonly user: typeof User) { }
 
-  async getUserByPhoneNumber(phoneNumber: string) {
+  async getAllUsers() {
+    return await this.user.findAll();
+  }
+
+  async getUserByResetToken(resetPasswordToken: string): Promise<any> {
+    const user = await this.user.findOne({
+      where: {
+        resetPasswordToken,
+        resetPasswordExpires: {
+          $gt: Date.now()
+        }
+      }
+    })
+
+    if (!user)
+      return { error: 'User not found' }
+
+    return user;
+  }
+
+  async getUserByPhoneNumber(phoneNumber: string): Promise<any> {
     const user = await this.user.findOne({ where: { phoneNumber } });
     if (!user)
-      return 'user not found';
+      return { error: 'User not found' };
     return user;
   }
 
@@ -33,22 +53,23 @@ export class UserService {
     });
     if (user) {
       if (user.phoneNumber === phoneNumber)
-        return 'user exist';
+        return { error: 'user exist' };
     }
     return false;
   }
 
-  async updateUser(phoneNumber: string, data: User) {
-    const user = await this.user.findOne({ where: { phoneNumber } });
-    if (user)
-      return 'user not found';
+  async updateUser(data: User): Promise<any> {
+    const user = await this.user.findOne({ where: { phoneNumber: data.phoneNumber } });
+    if (!user)
+      return { error: 'User not found' };
+    
     return await user.update(data);
   }
 
   async upgradeUser(userId: number, position: string) {
     const user = await this.user.findByPk(userId);
     if (!user)
-      return 'user not found';
+      return { error: 'User not found' };
 
     switch (position) {
       case 'member':
@@ -64,7 +85,7 @@ export class UserService {
   async deleteUser(phoneNumber: string) {
     const user = await this.user.findOne({ where: { phoneNumber } });
     if (!user)
-      return 'user not found';
+      return { error: 'User not found' };
     await user.destroy();
     return true;
   }
