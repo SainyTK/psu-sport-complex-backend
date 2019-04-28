@@ -19,14 +19,7 @@ export class AuthController {
   async signup(@Body() dto: SignupDTO, @Res() res) {
     const result = await this.authService.signup(SignupDTO.toUser(dto));
     return res.status(HttpStatus.OK).json(result);
-  } 
-
-  // @Post('/signin')
-  // @UsePipes(new ValidationPipe())
-  // async signinWithPhoneNumber(@Body('phoneNumber') phoneNumber: string, @Body('password') password: string, @Res() res) {
-  //   const result = await this.authService.signinWithPhoneNumber(phoneNumber, password);
-  //   return res.status(HttpStatus.OK).json(result);
-  // }
+  }
 
   @Post('/signin')
   @UsePipes(new ValidationPipe())

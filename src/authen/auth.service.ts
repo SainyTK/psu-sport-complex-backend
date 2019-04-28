@@ -28,9 +28,11 @@ export class AuthService {
   ) { }
 
   async signup(data: User) {
-    let exist = await this.userService.checkExistingUser(data);
-    if (exist) {
-      return exist;
+    if (data.psuPassport.length <= 0) {
+      let exist = await this.userService.checkExistingUser(data);
+      if (exist) {
+        return exist;
+      }
     }
 
     const hashPassword = await bcrypt.hash(data.password, saltRounds);
@@ -40,7 +42,7 @@ export class AuthService {
   }
 
   async signin(signInfo: string, password: string) {
-    const signinType = this.checkSignInType(signInfo);
+    const signinType = this.checkSignType(signInfo);
 
     switch (signinType) {
       case SIGNIN_TYPE.PHONE_NUMBER:
@@ -67,14 +69,37 @@ export class AuthService {
   }
 
   async signinWithPSUPassport(psuPassport: string, password: string) {
+    const result = await this.userService.getUserByPSUPassport(psuPassport);
 
-    console.log('psuPassport', psuPassport);
-    console.log('password', password);
-    const result = await this.getPSUInfo(psuPassport, password);
+    if (result) {
+      const isPasswordCorrect = await this.validatePassword(result, password);
+      if (!isPasswordCorrect)
+        return 'incorrect password';
 
-    console.log(result);
+      return await this.createToken(JwtPayload.fromModel(result));
+    }
 
-    return 'OK';
+    const info = await this.getPSUInfo(psuPassport, password);
+    const { fname, lname } = this.extractPSUInfo(info);
+
+    if (fname.length <= 0)
+      return 'user not found';
+
+    const user = {
+      fname,
+      lname,
+      phoneNumber: '',
+      psuPassport,
+      email: `${psuPassport}@psu.ac.th`,
+      password,
+      position: USER_POSITION.STUDENT,
+      dob: new Date(),
+      gender: 'M'
+    } as User;
+
+    const newUser = await this.signup(user);
+
+    return await this.createToken(JwtPayload.fromModel(newUser));
   }
 
   async signinWithToken(token: string) {
@@ -140,20 +165,27 @@ export class AuthService {
         if (err) return reject(err);
 
         let user = {
-          name: psuPassport,
+          username: psuPassport,
           password: password
         }
 
         client.GetStudentDetails(user, (err, response) => {
           if (err) return reject(err);
           else
-            return resolve(response);
+            return resolve(response.GetStudentDetailsResult.string);
         })
       })
     })
   }
 
-  private checkSignInType(userInfo: string) {
+  private extractPSUInfo(info) {
+    return {
+      fname: info[1],
+      lname: info[2]
+    }
+  }
+
+  private checkSignType(userInfo: string) {
     return userInfo.startsWith('0') ? SIGNIN_TYPE.PHONE_NUMBER : SIGNIN_TYPE.PSU_PASSPORT;
   }
 }

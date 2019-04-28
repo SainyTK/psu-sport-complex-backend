@@ -19,11 +19,12 @@ export class InitService {
 
     const isExist = await this.stadiumService.findAll();
 
+    users.forEach((user: User) => {
+      this.authService.signup(user)
+    });
+
     if (isExist.length <= 0) {
-      users.forEach((user: User) => {
-        this.authService.signup(user)
-      });
-  
+    
       stadiums.forEach((stadium: Stadium) => {
         this.stadiumService.insert(stadium)
       });

@@ -8,9 +8,16 @@ export class UserService {
   constructor(@Inject('userRepo') private readonly user: typeof User) { }
 
   async getUserByPhoneNumber(phoneNumber: string) {
-    const user = await this.user.findOne({ where: {phoneNumber }});
+    const user = await this.user.findOne({ where: { phoneNumber } });
     if (!user)
       return 'user not found';
+    return user;
+  }
+
+  async getUserByPSUPassport(psuPassport: string) {
+    const user = await this.user.findOne({ where: { psuPassport } });
+    if (!user)
+      return null;
     return user;
   }
 
@@ -18,7 +25,7 @@ export class UserService {
     return await this.user.create(data);
   }
 
-  async checkExistingUser({phoneNumber}: User) {
+  async checkExistingUser({ phoneNumber }: User) {
     let user = await this.user.findOne({
       where: {
         phoneNumber,
@@ -43,15 +50,15 @@ export class UserService {
     if (!user)
       return 'user not found';
 
-    switch(position) {
-      case 'member': 
+    switch (position) {
+      case 'member':
         user.position = USER_POSITION.MEMBER;
         break;
       case 'admin':
         user.position = USER_POSITION.ADMIN;
         break;
     }
-    return await this.user.update({position: user.position}, {where: {userId}});
+    return await this.user.update({ position: user.position }, { where: { userId } });
   }
 
   async deleteUser(phoneNumber: string) {
