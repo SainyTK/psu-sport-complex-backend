@@ -1,16 +1,16 @@
 import {
   Controller,
   Get,
-  Post,
   Res,
   Param,
-  UseInterceptors,
-  FileInterceptor,
-  UploadedFile,
   HttpStatus,
+  Body,
+  Patch,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { BillService } from './bill.service';
-import multerConfig from '../config/multer.config';
+import { TransactionDTO } from '../transaction/dto/transaction.dto';
 
 @Controller('bill')
 export class BillController {
@@ -24,30 +24,11 @@ export class BillController {
     return res.status(HttpStatus.OK).json(result);
   }
 
-
-  @UseInterceptors(FileInterceptor('file', multerConfig))
-  @Post('/upload_slip/:billId')
-  async uploadSlip(@UploadedFile() slip, @Param('billId') billId, @Res() res) {
-    const result = await this.billService.updateSlip(billId, slip.filename);
+  @Patch('/confirm/:billId')
+  @UsePipes(new ValidationPipe())
+  async confirm(@Param('billId') billId: number,@Body() dto: TransactionDTO, @Res() res) {
+    const result = await this.billService.confirm(billId, TransactionDTO.toModel(dto));
     return res.status(HttpStatus.OK).json(result);
-  }
-
-  @Get('/slip/:billId')
-  async getSlip(@Param('billId') path, @Res() res) {
-    let response = {};
-    try {
-      response = res.sendFile(path, { root: 'uploads' });
-    } catch (e) {
-      response = 'error'
-    }
-    return response;
-  }
-
-  @UseInterceptors(FileInterceptor('file', multerConfig))
-  @Post('/upload')
-  async testUpload(@UploadedFile() f, @Res() res) {
-    console.log(f.filename);
-    return res.status(HttpStatus.OK).json({ message: 'OK' })
   }
 
 }

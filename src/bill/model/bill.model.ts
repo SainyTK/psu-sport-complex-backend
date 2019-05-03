@@ -6,7 +6,12 @@ import {
     PrimaryKey,
     Table,
     Default,
+    ForeignKey,
+    BelongsTo,
+    HasMany,
 } from 'sequelize-typescript';
+import { Transaction } from '../../transaction/model/transaction.model';
+import { Booking } from '../../booking/model/booking.model';
 
 @Table({
     timestamps: true,
@@ -19,7 +24,16 @@ export class Bill extends Model<Bill> {
     @Column
     billId: number;
 
-    @Default('')
+    @HasMany(() => Booking)
+    bookings: Booking[];
+
+    @ForeignKey(() => Transaction)
+    @AllowNull(true)
+    @Default(null)
     @Column
-    slip: string;
+    transactionId: number;
+
+    @BelongsTo(() => Transaction, { foreignKey: { allowNull: true }})
+    transaction: Transaction;
+
 }
