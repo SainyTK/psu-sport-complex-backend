@@ -7,18 +7,18 @@ export class TransactionService {
   constructor(@Inject('transactionRepo') private readonly transaction: typeof Transaction) {}
 
   async find(transaction: Transaction) {
-
-    const ignoreOffsetTime = transaction.timestamp.toString().slice(0,19) + '.000Z';
+    
+    // const ignoreOffsetTime = transaction.date.toString().slice(0,19) + '.000Z';
 
     const transactions = await this.transaction.findAll({
       where: {
-        accountNumber: transaction.accountNumber.slice(6, 10),
-        balance: transaction.balance,
+        // account: transaction.account.slice(6, 10),
+        deposit: transaction.deposit,
         used: false,
-        timestamp: {
+        date: {
           $between: [
-            moment(ignoreOffsetTime).subtract(1,'minute').toDate(),
-            moment(ignoreOffsetTime).add(1,'minute').toDate()
+            moment(transaction.date).subtract(1, 'minute').toDate(),
+            moment(transaction.date).add(1, 'minute').toDate()
           ]
         }
       }

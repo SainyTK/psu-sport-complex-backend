@@ -189,7 +189,7 @@ export class AuthService {
 
   async validate(payload: JwtPayload): Promise<any> {
     if (!payload) return { error: 'Invalid token' };
-    return await this.userService.getUserByPhoneNumber(payload.phoneNumber);
+    return await this.userService.getUserById(payload.userId);
   }
 
   private async validatePassword(user: User, password: string) {

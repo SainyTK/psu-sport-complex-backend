@@ -22,12 +22,14 @@ import { ValidationPipe } from '../common/validation.pipe';
 import { AuthGuard } from '@nestjs/passport';
 import { extractToken } from '../common/utils/extract-token';
 import { AuthService } from '../authen/auth.service';
+import { StadiumService } from '../stadium/stadium.service';
 
 @Controller('booking')
 export class BookingController {
   constructor(
     private readonly bookingService: BookingService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly stadiumService: StadiumService,
   ) { }
 
   @Get('/all')
@@ -76,9 +78,11 @@ export class BookingController {
   @UseGuards(AuthGuard())
   @UsePipes(new ValidationPipe())
   @Post('/many')
-  async bookMany(@Body() dtos: BookingDTO[], @Res() res) {
+  async bookMany(@Body() dtos: BookingDTO[], @Req() req, @Res() res) {
     const bookingModels = dtos.map(dto => (BookingDTO.toModel(dto)));
-    const result = await this.bookingService.bookMany(bookingModels);
+    const user = await this.authService.validateToken(extractToken(req));
+    const fee = await this.stadiumService.calculateFee(user.position, bookingModels);
+    const result = await this.bookingService.bookMany(bookingModels, fee);
     return res.status(HttpStatus.OK).json(result);
   }
 

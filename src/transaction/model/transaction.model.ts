@@ -5,12 +5,8 @@ import {
     Model,
     PrimaryKey,
     Table,
-    ForeignKey,
-    BelongsTo,
     Default,
-    NotNull
 } from 'sequelize-typescript';
-import { Bill } from '../../bill/model/bill.model';
 
 @Table
 export class Transaction extends Model<Transaction> {
@@ -20,17 +16,17 @@ export class Transaction extends Model<Transaction> {
     @Column
     transactionId: number;
 
-    @AllowNull(false)
+    @AllowNull(true)
     @Column
-    accountNumber: string;
+    account: string;
 
     @AllowNull(false)
     @Column
-    balance: number;
+    deposit: number;
 
     @AllowNull(false)
     @Column
-    timestamp: Date;
+    date: Date;
 
     @AllowNull(false)
     @Default(false)

@@ -1,25 +1,22 @@
 import { IsString, IsNumber, IsDateString } from 'class-validator';
-import { Transaction } from '../model/transaction.model';
+import { Transaction } from '../../transaction/model/transaction.model';
 
-export class TransactionDTO {
+export class ConfirmBillDTO {
     @IsString() account: string;
     @IsNumber() deposit: number;
     @IsDateString() date: Date;
-    @IsString() tid: String;
 
-    static toModel(dto: TransactionDTO): Transaction {
+    static toTransactionModel(dto: ConfirmBillDTO): Transaction {
         const {
             account,
             deposit,
             date,
-            tid
         } = dto;
         
         const model = {
             account,
             deposit,
-            date,
-            tid
+            date
         } as Transaction;
 
         return model;

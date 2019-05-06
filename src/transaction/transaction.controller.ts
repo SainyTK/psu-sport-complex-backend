@@ -24,9 +24,9 @@ export class TransactionController {
 
   @Post()
   @UsePipes(new ValidationPipe())
-  async createTransaction(@Body() dto: TransactionDTO, @Res() res) {
-    console.log(dto);
-    await this.transactionService.create(TransactionDTO.toModel(dto));
+  async createTransaction(@Body('data') dtos: TransactionDTO[], @Res() res) {
+    const promises = dtos.map((dto) => this.transactionService.create(TransactionDTO.toModel(dto)));
+    await Promise.all(promises);
     return res.status(HttpStatus.OK).send('SUCCEED');
   }
 

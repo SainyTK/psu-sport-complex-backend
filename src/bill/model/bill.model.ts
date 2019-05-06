@@ -12,6 +12,7 @@ import {
 } from 'sequelize-typescript';
 import { Transaction } from '../../transaction/model/transaction.model';
 import { Booking } from '../../booking/model/booking.model';
+import { User } from 'src/user/model/user.model';
 
 @Table({
     timestamps: true,
@@ -23,6 +24,18 @@ export class Bill extends Model<Bill> {
     @AutoIncrement
     @Column
     billId: number;
+
+    @AllowNull(false)
+    @Column
+    fee: number;
+
+    @ForeignKey(() => User)
+    @AllowNull(false)
+    @Column
+    userId: number;
+
+    @BelongsTo(() => User)
+    owner: User;
 
     @HasMany(() => Booking)
     bookings: Booking[];

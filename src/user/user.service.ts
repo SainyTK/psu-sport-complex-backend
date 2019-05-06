@@ -11,6 +11,15 @@ export class UserService {
     return await this.user.findAll();
   }
 
+  async getUserById(userId: number) {
+    const user = await this.user.findByPk(userId);
+
+    if (!user) 
+      return false;
+    
+    return user;
+  }
+
   async getUserByResetToken(resetPasswordToken: string): Promise<any> {
     const user = await this.user.findOne({
       where: {
