@@ -41,6 +41,9 @@ export class TransactionService {
   }
 
   async create(transaction: Transaction) {
+    const t = await this.transaction.find({where: {tid: transaction.tid}});
+    if (t)
+      return { error: 'Already exist transaction' };
     return await this.transaction.create(transaction);
   }
 

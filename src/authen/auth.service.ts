@@ -20,7 +20,9 @@ const PSU_URL = 'https://passport.psu.ac.th/authentication/authentication.asmx?w
 
 enum SIGNIN_TYPE {
   PHONE_NUMBER,
-  PSU_PASSPORT
+  PSU_PASSPORT,
+  STUDENT,
+  STAFF
 }
 
 @Injectable()
@@ -89,6 +91,8 @@ export class AuthService {
     if (fname.length <= 0)
       return { error: 'user not found' };
 
+    const position = this.getPSUSignType(psuPassport);
+
     const user = {
       fname,
       lname,
@@ -96,7 +100,7 @@ export class AuthService {
       psuPassport,
       email: `${psuPassport}@psu.ac.th`,
       password,
-      position: USER_POSITION.STUDENT,
+      position,
       dob: new Date(),
       gender: 'M'
     } as User;
@@ -235,10 +239,10 @@ export class AuthService {
           password: password
         }
 
-        client.GetStudentDetails(user, (err, response) => {
+        client.GetStaffDetails(user, (err, response) => {
           if (err) return reject(err);
           else
-            return resolve(response.GetStudentDetailsResult.string);
+            return resolve(response.GetStaffDetailsResult.string);
         })
       })
     })
@@ -253,5 +257,13 @@ export class AuthService {
 
   private checkSignType(userInfo: string) {
     return userInfo.startsWith('0') ? SIGNIN_TYPE.PHONE_NUMBER : SIGNIN_TYPE.PSU_PASSPORT;
+  }
+
+  private getPSUSignType(psuPassport: string) {
+    if (psuPassport.match('/a-z/')) {
+      return 'staff';
+    }
+
+    return 'student';
   }
 }

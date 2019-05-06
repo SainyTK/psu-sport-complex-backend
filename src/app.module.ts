@@ -5,6 +5,7 @@ import { StadiumModule } from './stadium/stadium.module';
 import { BookingModule } from './booking/booking.module';
 import { BillModule } from './bill/bill.module';
 import { InitModule } from './init/init.module';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { InitModule } from './init/init.module';
     AuthModule,
     StadiumModule,
     BookingModule,
-    BillModule
+    BillModule,
+    TransactionModule
   ],
   controllers: [],
   providers: [],

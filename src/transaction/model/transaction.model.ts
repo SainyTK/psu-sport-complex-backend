@@ -36,4 +36,8 @@ export class Transaction extends Model<Transaction> {
     @Default(false)
     @Column
     used: boolean;
+
+    @AllowNull(false)
+    @Column
+    tid: string;
 }
