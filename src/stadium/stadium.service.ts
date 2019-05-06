@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Stadium } from './model/stadium.model';
 import { Booking } from '../booking/model/booking.model';
-import { USER_POSITION } from 'src/user/constant/user-position';
+import { USER_POSITION } from '../user/constant/user-position';
 
 @Injectable()
 export class StadiumService {

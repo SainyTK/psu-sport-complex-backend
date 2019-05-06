@@ -12,7 +12,7 @@ import {
 } from 'sequelize-typescript';
 import { Transaction } from '../../transaction/model/transaction.model';
 import { Booking } from '../../booking/model/booking.model';
-import { User } from 'src/user/model/user.model';
+import { User } from '../../user/model/user.model';
 
 @Table({
     timestamps: true,
