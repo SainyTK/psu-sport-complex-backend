@@ -41,9 +41,22 @@ export class BillController {
     return res.status(HttpStatus.OK).json(bills);
   }
 
+  @UseGuards(AuthGuard())
+  @Get('/my/last')
+  async getMyLastBill(@Req() req, @Res() res) {
+    const user = await this.authService.validateToken(extractToken(req));
+    if (user.error)
+      return res.status(HttpStatus.OK).json(user);
+
+    const bill = await this.billService.getMyLastBill(user.userId);
+    if (!bill)
+      return res.status(HttpStatus.OK).json({ error: 'bill not found' });
+    return res.status(HttpStatus.OK).json(bill);
+  }
+
   @Patch('/confirm/:billId')
   @UsePipes(new ValidationPipe())
-  async confirm(@Param('billId') billId: number,@Body() dto: ConfirmBillDTO, @Res() res) {
+  async confirm(@Param('billId') billId: number, @Body() dto: ConfirmBillDTO, @Res() res) {
     const result = await this.billService.confirm(billId, ConfirmBillDTO.toTransactionModel(dto));
     return res.status(HttpStatus.OK).json(result);
   }

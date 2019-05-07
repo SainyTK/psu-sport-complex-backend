@@ -4,6 +4,7 @@ import { BookingService } from '../booking/booking.service';
 import { TransactionService } from '../transaction/transaction.service';
 import { Transaction } from '../transaction/model/transaction.model';
 import { Booking } from '../booking/model/booking.model';
+import moment from 'moment';
 
 @Injectable()
 export class BillService {
@@ -14,18 +15,30 @@ export class BillService {
     ) { }
 
     async findAll() {
+        await this.filterExpired();
         return await this.bill.findAll({ include: [Booking] });
     }
 
     async findById(billId: number) {
+        await this.filterExpired();
         return await this.bill.findOne({ where: { billId } })
     }
 
     async findByUserId(userId: number) {
+        await this.filterExpired();
         return await this.bill.findAll({ 
             where: { userId },
-            include: [Booking, Transaction]
+            include: [Booking, Transaction],
+            order: [['createdAt', 'DESC']]
         })
+    }
+
+    async getMyLastBill(userId: number) {
+        await this.filterExpired();
+        const bills = await this.findByUserId(userId);
+        if (!bills || bills.length <= 0)
+            return false;
+        return bills[0];
     }
 
     async createBill(userId: number, fee: number) {
@@ -54,4 +67,13 @@ export class BillService {
         await bill.destroy();
         return `Deleted bill id ${billId}`;
     }
+
+    private async filterExpired() {
+        const bills = await this.bill.findAll({ where: { transactionId: null } });
+    
+        for(let bill of bills) {
+          if (moment().diff(bill.createdAt, 'minute') > 20)
+            await this.deleteById(bill.billId);
+        }
+      }
 }
