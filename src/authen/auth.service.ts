@@ -75,7 +75,7 @@ export class AuthService {
   }
 
   async signinWithPSUPassport(psuPassport: string, password: string) {
-    const result = await this.userService.getUserByPSUPassport(psuPassport);
+    let result = await this.userService.getUserByPSUPassport(psuPassport);
 
     if (result) {
       const isPasswordCorrect = await this.validatePassword(result, password);
@@ -105,9 +105,10 @@ export class AuthService {
       gender: 'M'
     } as User;
 
-    const newUser = await this.signup(user);
+    await this.signup(user);
+    result = await this.userService.getUserByPSUPassport(psuPassport);
 
-    return await this.createToken(JwtPayload.fromModel(newUser));
+    return await this.createToken(JwtPayload.fromModel(result));
   }
 
   async signinWithToken(token: string) {
