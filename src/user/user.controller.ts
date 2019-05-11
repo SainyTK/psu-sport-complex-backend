@@ -8,13 +8,17 @@ import {
   Req,
   Param,
   Get,
-  Post
+  Post,
+  UsePipes,
+  ValidationPipe,
+  HttpStatus
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './model/user.model';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from '../authen/auth.service';
 import { extractToken } from '../common/utils/extract-token';
+import { MemberDTO } from './dto/member.dto';
 
 
 @Controller('user')
@@ -42,6 +46,13 @@ export class UserController {
     await this.authService.checkAdminFromToken(extractToken(req));
     const result = await this.userService.upgradeUser(userId, position);
     return res.json({result});
+  }
+
+  @Patch('/member/:userId')
+  @UsePipes(new ValidationPipe())
+  async toMember(@Body() data: MemberDTO,@Param('userId') userId, @Res() res) {
+    const result = await this.userService.toMember(+userId, data);
+    return res.status(HttpStatus.OK).json(result);
   }
 
   @UseGuards(AuthGuard())

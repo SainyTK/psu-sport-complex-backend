@@ -52,6 +52,16 @@ export class User extends Model<User> {
     @Column
     position: string;
 
+    @AllowNull(true)
+    @Default(null)
+    @Column
+    memberStart: Date;
+
+    @AllowNull(true)
+    @Default(null)
+    @Column
+    memberEnd: Date;
+
     @AllowNull(false)
     @Column
     dob: Date;

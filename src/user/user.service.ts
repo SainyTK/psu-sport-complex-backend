@@ -1,23 +1,31 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { User } from './model/user.model';
 import { USER_POSITION } from './constant/user-position';
+import { MemberDTO } from './dto/member.dto';
+import moment from 'moment';
+import { TransactionService } from '../transaction/transaction.service';
 
 @Injectable()
 export class UserService {
 
-  constructor(@Inject('userRepo') private readonly user: typeof User) { }
+  constructor(@Inject('userRepo') 
+    private readonly user: typeof User,
+    private readonly transactionService: TransactionService
+  ) { }
 
   async getAllUsers() {
-    return await this.user.findAll();
+    const users = await this.user.findAll();
+
+    return await this.filterMembers(users);
   }
 
   async getUserById(userId: number) {
     const user = await this.user.findByPk(userId);
 
-    if (!user) 
+    if (!user)
       return false;
-    
-    return user;
+
+    return await this.filterMember(user);
   }
 
   async getUserByResetToken(resetPasswordToken: string): Promise<any> {
@@ -33,14 +41,14 @@ export class UserService {
     if (!user)
       return { error: 'User not found' }
 
-    return user;
+    return await this.filterMember(user);
   }
 
   async getUserByPhoneNumber(phoneNumber: string): Promise<any> {
     const user = await this.user.findOne({ where: { phoneNumber } });
     if (!user)
       return { error: 'User not found' };
-    return user;
+    return await this.filterMember(user);
   }
 
   async getUserByPSUPassport(psuPassport: string) {
@@ -71,7 +79,7 @@ export class UserService {
     const user = await this.user.findOne({ where: { phoneNumber: data.phoneNumber } });
     if (!user)
       return { error: 'User not found' };
-    
+
     return await user.update(data);
   }
 
@@ -88,7 +96,32 @@ export class UserService {
         user.position = USER_POSITION.ADMIN;
         break;
     }
-    return await this.user.update({ position: user.position }, { where: { userId } });
+    return await user.update({ position: user.position });
+  }
+
+  async toMember(userId: number, data: MemberDTO): Promise<any> {
+    const { startDate, endDate, amount } = data;
+    const user = await this.user.findByPk(userId);
+
+    if (!user)
+      return { error: 'User not found' };
+
+    if (user.position !== USER_POSITION.GENERAL_PUBLIC)
+      return { error: `This user can't upgrage to member` };
+
+    user.memberStart = moment(startDate).toDate();
+    user.memberEnd = moment(endDate).toDate();
+    user.position = USER_POSITION.MEMBER;
+
+    const result = await user.update({
+      memberStart: moment(startDate).toDate(),
+      memberEnd: moment(endDate).toDate(),
+      position: USER_POSITION.MEMBER
+    });
+
+    await this.transactionService.createMemberTransaction(amount);
+
+    return result;
   }
 
   async deleteUser(phoneNumber: string) {
@@ -97,5 +130,26 @@ export class UserService {
       return { error: 'User not found' };
     await user.destroy();
     return true;
+  }
+
+  private async filterMember(user: User) {
+    if (!user.memberEnd)
+      return user;
+
+    if (moment(user.memberEnd).diff(moment(), 'days') <= 0) {
+      return await user.update({
+        memberStart: null,
+        memberEnd: null,
+        position: USER_POSITION.GENERAL_PUBLIC
+      })
+    }
+
+    return user;
+  }
+
+  private async filterMembers(users: User[]) {
+    const promises = users.map((user) => this.filterMember(user));
+    const result = await Promise.all(promises);
+    return result;
   }
 }

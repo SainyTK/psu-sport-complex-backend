@@ -4,7 +4,8 @@ import moment from 'moment';
 
 @Injectable()
 export class TransactionService {
-  constructor(@Inject('transactionRepo') private readonly transaction: typeof Transaction) {}
+  constructor(
+    @Inject('transactionRepo') private readonly transaction: typeof Transaction) {}
 
   async find(transaction: Transaction) {
     
@@ -40,11 +41,28 @@ export class TransactionService {
     return transaction;
   }
 
+  async findMemberTransactions() {
+    const transactions = await this.transaction.findAll({where: {tid: 'create member'}});
+    return transactions;
+  }
+
   async create(transaction: Transaction) {
     const t = await this.transaction.find({where: {tid: transaction.tid}});
     if (t)
       return { error: 'Already exist transaction' };
     return await this.transaction.create(transaction);
+  }
+
+  async createMemberTransaction(amount: number) {
+    const t = {
+      account: 'create memner',
+      deposit: amount,
+      date: moment().toDate(),
+      used: true,
+      tid: 'create member'
+    } as Transaction;
+
+    return await this.transaction.create(t);
   }
 
   async useTransaction(transactionId: number) {

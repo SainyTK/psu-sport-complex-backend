@@ -4,7 +4,6 @@ import {
   Res,
   Post,
   Body,
-  Param,
   HttpStatus,
   UsePipes,
   ValidationPipe,
@@ -19,6 +18,12 @@ export class TransactionController {
   @Get()
   async getAllTransaction(@Res() res) {
     const result = await this.transactionService.findAll();
+    return res.status(HttpStatus.OK).json(result);
+  }
+
+  @Get('/member')
+  async getMemberTransactions(@Res() res) {
+    const result = await this.transactionService.findMemberTransactions();
     return res.status(HttpStatus.OK).json(result);
   }
 
