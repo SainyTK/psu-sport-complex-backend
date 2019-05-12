@@ -34,6 +34,10 @@ export class Booking extends Model<Booking> {
     description: string;
 
     @AllowNull(false)
+    @Column
+    fee: number;
+
+    @AllowNull(false)
     @Default(BOOKING_STATUS.UNPAID)
     @Column
     status: string;

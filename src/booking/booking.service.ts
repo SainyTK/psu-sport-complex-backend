@@ -104,7 +104,7 @@ export class BookingService {
     return result;
   }
 
-  async bookMany(dataList: Booking[], fee: number) {
+  async bookMany(userPosition: string, dataList: Booking[]) {
     let userId;
     for (let data of dataList) {
       const error = await this.validateBooking(data);
@@ -116,10 +116,15 @@ export class BookingService {
       userId = data.userId;
     }
 
+    const fee = await this.stadiumService.calculateBookingsFee(userPosition, dataList);
     const bill = await this.billService.createBill(userId, fee);
+
+    const stadiumId = dataList[0].stadiumId;
+    const stadium = await this.stadiumService.findById(stadiumId);
 
     const results = await dataList.map((data) => {
       data.billId = bill.billId;
+      data.fee = this.stadiumService.calculateBookingFee(userPosition, data, stadium);
       this.booking.create(data);
       return data;
     });

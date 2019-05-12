@@ -81,8 +81,7 @@ export class BookingController {
   async bookMany(@Body() dtos: BookingDTO[], @Req() req, @Res() res) {
     const bookingModels = dtos.map(dto => (BookingDTO.toModel(dto)));
     const user = await this.authService.validateToken(extractToken(req));
-    const fee = await this.stadiumService.calculateFee(user.position, bookingModels);
-    const result = await this.bookingService.bookMany(bookingModels, fee);
+    const result = await this.bookingService.bookMany(user.position, bookingModels);
     return res.status(HttpStatus.OK).json(result);
   }
 

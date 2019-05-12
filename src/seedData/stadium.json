@@ -1,56 +1,47 @@
 [
     {
       "stadiumId": 1,
-      "name": "tennis",
-      "numCourt": 2,
-      "costPublic": 100,
-      "costMember": 50,
+      "name": "table tennis",
+      "numCourt": 3,
       "costStudent": 20,
-      "costStaff": 30
+      "costStaff": 30,
+      "costMember": 50,
+      "costPublic": 80
     },
     {
       "stadiumId": 2,
-      "name": "table tennis",
-      "numCourt": 3,
-      "costPublic": 40,
-      "costMember": 30,
-      "costStudent": 20,
-      "costStaff": 20
+      "name": "badminton",
+      "numCourt": 4,
+      "costStudent": 60,
+      "costStaff": 80,
+      "costMember": 120,
+      "costPublic": 160
     },
     {
       "stadiumId": 3,
-      "name": "swimming",
+      "name": "basketball",
       "numCourt": 1,
-      "costPublic": 80,
-      "costMember": 40,
-      "costStudent": 30,
-      "costStaff": 30
+      "costStudent": 500,
+      "costStaff": 600,
+      "costMember": 800,
+      "costPublic": 1200
     },
     {
       "stadiumId": 4,
-      "name": "basketball",
+      "name": "valley ball",
       "numCourt": 1,
-      "costPublic": 70,
-      "costMember": 40,
-      "costStudent": 20,
-      "costStaff": 30
+      "costStudent": 500,
+      "costStaff": 600,
+      "costMember": 800,
+      "costPublic": 1200
     },
     {
       "stadiumId": 5,
-      "name": "volley ball",
-      "numCourt": 1,
-      "costPublic": 70,
-      "costMember": 40,
-      "costStudent": 20,
-      "costStaff": 30
-    },
-    {
-      "stadiumId": 6,
-      "name": "badminton",
+      "name": "tennis",
       "numCourt": 4,
-      "costPublic": 60,
-      "costMember": 60,
-      "costStudent": 50,
-      "costStaff": 50
+      "costStudent": 40,
+      "costStaff": 60,
+      "costMember": 80,
+      "costPublic": 100
     }
    ]
