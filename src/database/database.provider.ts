@@ -6,6 +6,7 @@ import { Stadium } from '../stadium/model/stadium.model';
 import { Booking } from '../booking/model/booking.model';
 import { Bill } from '../bill/model/bill.model';
 import { Transaction } from '../transaction/model/transaction.model';
+import { Blackout } from '../operationTime/model/blackout.model';
 
 export const DatabaseProviders = [
     {
@@ -24,7 +25,8 @@ export const DatabaseProviders = [
                 Stadium,
                 Booking,
                 Bill,
-                Transaction
+                Transaction,
+                Blackout
             ]);
             await sequelize.sync();
             return sequelize;

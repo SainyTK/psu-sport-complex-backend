@@ -6,6 +6,8 @@ import { BookingModule } from './booking/booking.module';
 import { BillModule } from './bill/bill.module';
 import { InitModule } from './init/init.module';
 import { TransactionModule } from './transaction/transaction.module';
+import { OperationTimeModule } from './operationTime/operationTime.module';
+
 
 @Module({
   imports: [
@@ -15,7 +17,8 @@ import { TransactionModule } from './transaction/transaction.module';
     StadiumModule,
     BookingModule,
     BillModule,
-    TransactionModule
+    TransactionModule,
+    OperationTimeModule
   ],
   controllers: [],
   providers: [],
