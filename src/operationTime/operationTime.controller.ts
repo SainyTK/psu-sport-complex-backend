@@ -45,7 +45,6 @@ export class OperationTimeController {
   }
 
   @Delete('/blackout/:blackoutId')
-  @UsePipes(new ValidationPipe())
   async deleteBlackout(@Param('blackoutId') blackoutId: number, @Res() res) {
     const result = await this.operationTimeService.deleteBlackout(blackoutId);
     return res.status(HttpStatus.OK).json(result);

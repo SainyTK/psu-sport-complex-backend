@@ -261,7 +261,7 @@ export class AuthService {
   }
 
   private getPSUSignType(psuPassport: string) {
-    if (psuPassport.match('/a-z/')) {
+    if (psuPassport.charAt(0).match('/a-z/')) {
       return 'staff';
     }
 

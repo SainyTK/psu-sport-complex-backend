@@ -120,17 +120,15 @@ export class BookingController {
 
   @UsePipes(new ValidationPipe())
   @Delete('/bill/:billId')
-  async deleteByBillId(@Param('billId') billId, @Res() res) {
+  async deleteByBillId(@Param('billId') billId,@Req() req, @Res() res) {
     const bookings = await this.bookingService.findByBillId(billId);
     if (!bookings || bookings.length === 0)
-      return res.status(HttpStatus.OK).json({error: 'Booking not found'});
+      return res.status(HttpStatus.OK).json({error: 'Booking not found'})
 
-    console.log("Test");
+    await this.authService.checkOwnerFromToken(extractToken(req), bookings[0]);
+    const result = await this.bookingService.deleteByBillId(billId);
 
-    // await this.authService.checkOwnerFromToken(extractToken(req), bookings[0]);
-    // const result = await this.bookingService.deleteByBillId(billId);
-
-    return res.status(HttpStatus.OK).json("test");
+    return res.status(HttpStatus.OK).json(result);
   }
 
 }
