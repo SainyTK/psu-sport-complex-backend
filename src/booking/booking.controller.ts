@@ -120,7 +120,7 @@ export class BookingController {
 
   @UsePipes(new ValidationPipe())
   @Delete('/bill/:billId')
-  async deleteByBillId(@Param('billId') billId,@Req() req, @Res() res) {
+  async deleteByBillId(@Param('billId') billId, @Res() res) {
     const bookings = await this.bookingService.findByBillId(billId);
     if (!bookings || bookings.length === 0)
       return res.status(HttpStatus.OK).json({error: 'Booking not found'})
