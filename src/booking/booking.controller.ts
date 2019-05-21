@@ -123,7 +123,9 @@ export class BookingController {
   async deleteByBillId(@Param('billId') billId, @Res() res) {
     const bookings = await this.bookingService.findByBillId(billId);
     if (!bookings || bookings.length === 0)
-      return res.status(HttpStatus.OK).json({error: 'Booking not found'})
+      return res.status(HttpStatus.OK).json({error: 'Booking not found'});
+
+    console.log("Test");
 
     // await this.authService.checkOwnerFromToken(extractToken(req), bookings[0]);
     // const result = await this.bookingService.deleteByBillId(billId);
