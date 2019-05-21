@@ -125,10 +125,10 @@ export class BookingController {
     if (!bookings || bookings.length === 0)
       return res.status(HttpStatus.OK).json({error: 'Booking not found'})
 
-    await this.authService.checkOwnerFromToken(extractToken(req), bookings[0]);
-    const result = await this.bookingService.deleteByBillId(billId);
+    // await this.authService.checkOwnerFromToken(extractToken(req), bookings[0]);
+    // const result = await this.bookingService.deleteByBillId(billId);
 
-    return res.status(HttpStatus.OK).json(result);
+    return res.status(HttpStatus.OK).json("test");
   }
 
 }
