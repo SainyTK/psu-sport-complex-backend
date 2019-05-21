@@ -6,6 +6,8 @@ import {
   Post,
   Body,
   UsePipes,
+  Delete,
+  Param,
 } from '@nestjs/common';
 import { OperationTimeService } from './operationTime.service';
 import { BlackoutDTO } from './dto/blackout.dto';
@@ -39,6 +41,13 @@ export class OperationTimeController {
   @UsePipes(new ValidationPipe())
   async createBlackout(@Body() dto:BlackoutDTO, @Res() res) {
     const result = await this.operationTimeService.createBlackout(BlackoutDTO.toModel(dto));
+    return res.status(HttpStatus.OK).json(result);
+  }
+
+  @Delete('/blackout/:blackoutId')
+  @UsePipes(new ValidationPipe())
+  async deleteBlackout(@Param('blackoutId') blackoutId: number, @Res() res) {
+    const result = await this.operationTimeService.deleteBlackout(blackoutId);
     return res.status(HttpStatus.OK).json(result);
   }
 

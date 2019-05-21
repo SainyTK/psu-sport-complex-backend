@@ -15,8 +15,17 @@ export class OperationTimeService {
     }
 
     async createBlackout(data: Blackout) {
-        console.log(data);
         return await this.blackout.create(data);
+    }
+
+    async deleteBlackout(blackoutId: number) {
+        const blackout = await this.blackout.findByPk(blackoutId);
+
+        if (!blackout)
+            return false;
+        
+        await blackout.destroy();
+        return 'delete successful';
     }
 
     async getOperationTimes() {
