@@ -30,7 +30,7 @@ export class OperationTimeService {
 
     async getOperationTimes() {
         return new Promise((resolve, reject) => {
-            fs.readFile(`${__dirname}/file/optime.json`, (err, data) => {
+            fs.readFile(`${__dirname}/../../file/optime.json`, (err, data) => {
                 if (err)
                     reject(err);
                 else
@@ -41,7 +41,7 @@ export class OperationTimeService {
 
     async setOperationTimes(data) {
         return new Promise((resolve, reject) => {
-            fs.writeFile(`${__dirname}/file/optime.json`, JSON.stringify(data), (err) => {
+            fs.writeFile(`${__dirname}/../../file/optime.json`, JSON.stringify(data), (err) => {
                 if (err)
                     reject(err);
                 else   
