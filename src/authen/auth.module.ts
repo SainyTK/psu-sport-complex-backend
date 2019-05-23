@@ -13,7 +13,8 @@ import { UserModule } from '../user/user.module';
     JwtModule.register({
       secretOrPrivateKey: 'secretKey',
       signOptions: {
-        expiresIn: 3600 * 24 * 365,
+        //not expire
+        // expiresIn: 3600,
       }
     }),
     UserModule
