@@ -73,6 +73,11 @@ export class User extends Model<User> {
     @AllowNull(true)
     @Default(null)
     @Column
+    refreshToken: string;
+
+    @AllowNull(true)
+    @Default(null)
+    @Column
     resetPasswordToken: string;
 
     @AllowNull(true)

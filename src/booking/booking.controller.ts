@@ -87,6 +87,14 @@ export class BookingController {
 
   @UseGuards(AuthGuard())
   @UsePipes(new ValidationPipe())
+  @Patch('/:bookingId')
+  async updateBooking(@Param('bookingId') bookingId, @Body() dto: BookingDTO, @Res() res) {
+    const result = await this.bookingService.update(bookingId, BookingDTO.toModel(dto));
+    return res.status(HttpStatus.OK).json(result);
+  }
+
+  @UseGuards(AuthGuard())
+  @UsePipes(new ValidationPipe())
   @Patch('/approve/:bookingId')
   async approve(@Param('bookingId') bookingId, @Req() req, @Res() res) {
     await this.authService.checkAdminFromToken(extractToken(req));

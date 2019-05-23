@@ -58,6 +58,13 @@ export class UserService {
     return user;
   }
 
+  async getUserByRefreshToken(refreshToken: string): Promise<any> {
+    const user = await this.user.findOne({ where: { refreshToken } });
+    if (!user)
+      return { error: 'User not found' };
+    return await this.filterMember(user);
+  }
+
   async createUser(data: User) {
     return await this.user.create(data);
   }
@@ -76,7 +83,7 @@ export class UserService {
   }
 
   async updateUser(data: User): Promise<any> {
-    const user = await this.user.findOne({ where: { phoneNumber: data.phoneNumber } });
+    const user = await this.user.findByPk(data.userId);
     if (!user)
       return { error: 'User not found' };
 

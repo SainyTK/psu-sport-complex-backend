@@ -8,6 +8,7 @@ import { BOOKING_STATUS } from './constant/booking-status';
 import { Stadium } from '../stadium/model/stadium.model';
 import { StadiumService } from '../stadium/stadium.service';
 import { BillService } from '../bill/bill.service';
+import { OperationTimeService } from '../operationTime/operationTime.service';
 import moment from 'moment';
 
 @Injectable()
@@ -15,6 +16,7 @@ export class BookingService {
   constructor(
     @Inject('bookingRepo') private readonly booking: typeof Booking,
     private readonly stadiumService: StadiumService,
+    private readonly operationTimeService: OperationTimeService,
     @Inject(forwardRef(() => BillService)) private readonly billService: BillService
   ) { }
 
@@ -89,7 +91,7 @@ export class BookingService {
 
     booking.status = isApprove ? BOOKING_STATUS.APPROVED : BOOKING_STATUS.UNAPPROVED;
 
-    return await this.booking.update({status: booking.status}, {where: {bookingId: booking.bookingId}});
+    return await this.booking.update({ status: booking.status }, { where: { bookingId: booking.bookingId } });
   }
 
   async approveByBill(billId: number) {
@@ -141,6 +143,20 @@ export class BookingService {
     return booking;
   }
 
+  async update(bookingId: number, data: Booking) {
+    const booking = await this.findById(bookingId);
+    if (!booking)
+      return {error: 'Booking not found'};
+    
+    let error = this.operationTimeService.checkPassed(booking.startDate, booking.endDate);
+    if (error) return error;
+    let error2 = await this.validateBooking(data);
+    if (error2) return error2;
+
+    await booking.update(data);
+    return 'update success';
+  }
+
   async deleteById(bookingId: number) {
     const booking = await this.booking.findByPk(bookingId);
     await booking.destroy()
@@ -150,7 +166,7 @@ export class BookingService {
   async deleteByBillId(billId: number) {
     const bookings = await this.findByBillId(billId);
     bookings.forEach((booking) => {
-      this.booking.destroy({where: {bookingId: booking.bookingId}});
+      this.booking.destroy({ where: { bookingId: booking.bookingId } });
     });
 
     await this.billService.deleteById(billId);
@@ -161,7 +177,7 @@ export class BookingService {
   private async filterExpired() {
     const bookings = await this.booking.findAll({ where: { status: BOOKING_STATUS.UNPAID } });
 
-    for(let booking of bookings) {
+    for (let booking of bookings) {
       if (moment().diff(booking.createdAt, 'minute') > 20)
         await this.deleteById(booking.bookingId);
     }
@@ -169,8 +185,14 @@ export class BookingService {
 
   private async validateBooking(data: Booking) {
     const { startDate, endDate, stadiumId, courtId } = data;
+
     if (startDate > endDate)
       return { error: 'start date lead end date' };
+
+    const outOfService = await this.operationTimeService.checkAvailableDate(startDate, endDate);
+
+    if (outOfService)
+      return { error: outOfService };
 
     const overlapBooking = await this.findOverlapBooking(startDate, endDate, data);
     if (overlapBooking.length > 0)

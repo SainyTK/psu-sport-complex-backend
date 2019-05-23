@@ -7,6 +7,7 @@ import { PassportModule } from '@nestjs/passport';
 import MulterConfigService from '../config/multerconfig.service';
 import { StadiumModule } from '../stadium/stadium.module';
 import { BillModule } from '../bill/bill.module';
+import { OperationTimeModule } from '../operationTime/operationTime.module';
 
 @Global()
 @Module({
@@ -17,7 +18,8 @@ import { BillModule } from '../bill/bill.module';
     }),
     DatabaseModule,
     StadiumModule,
-    BillModule
+    BillModule,
+    OperationTimeModule
   ],
   exports: [BookingService],
   controllers: [BookingController],
