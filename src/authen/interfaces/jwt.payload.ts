@@ -8,6 +8,7 @@ export class JwtPayload {
     dob: Date;
     gender: 'M' | 'F';
     position: string;
+    refreshToken: string;
 
     public static fromModel(user) {
         const payload = {
@@ -19,7 +20,8 @@ export class JwtPayload {
             psuPassport: user.psuPassport,
             dob: user.dob,
             gender: user.gender,
-            position: user.position
+            position: user.position,
+            refreshToken: user.refreshToken
         }
 
         return payload as JwtPayload;

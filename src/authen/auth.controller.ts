@@ -37,6 +37,16 @@ export class AuthController {
     return res.status(HttpStatus.OK).json(result);
   }
 
+  @Post('/signout')
+  async signout(@Body('accessToken') token: string) {
+    let result = await this.authService.validateToken(token);
+    if (result.error)
+      return result;
+    
+    result = await this.authService.signout(result.refreshToken);
+    return result;
+  }
+
   @Post('/forget_password')
   @UsePipes(new ValidationPipe())
   async forgetPassword(@Body('phoneNumber') phoneNumber: string, @Res() res) {

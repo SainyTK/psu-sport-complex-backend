@@ -71,7 +71,7 @@ export class AuthService {
     if (!isPasswordCorrect)
       return { error: 'incorrect password' };
 
-    return await this.createToken(JwtPayload.fromModel(result));
+    return await this.updateRefreshToken(result);
   }
 
   async signinWithPSUPassport(psuPassport: string, password: string) {
@@ -82,7 +82,7 @@ export class AuthService {
       if (!isPasswordCorrect)
         return { error: 'incorrect password' };
 
-      return await this.createToken(JwtPayload.fromModel(result));
+      return await this.updateRefreshToken(result);
     }
 
     const info = await this.getPSUInfo(psuPassport, password);
@@ -108,7 +108,25 @@ export class AuthService {
     await this.signup(user);
     result = await this.userService.getUserByPSUPassport(psuPassport);
 
-    return await this.createToken(JwtPayload.fromModel(result));
+    return await this.updateRefreshToken(result);
+  }
+
+  async updateRefreshToken(user: User) {
+    //clear old token
+    user.refreshToken = null;
+
+    const tokenObj = await this.createToken(JwtPayload.fromModel(user));
+    user.refreshToken = tokenObj.accessToken;
+    const tokenObj2 = await this.createToken(JwtPayload.fromModel(user));
+
+    const data = {
+      userId: user.userId,
+      refreshToken: tokenObj.accessToken
+    } as User;
+
+    await this.userService.updateUser(data);
+
+    return tokenObj2;
   }
 
   async signinWithToken(token: string) {
@@ -122,6 +140,24 @@ export class AuthService {
     } catch (e) {
       return { error: 'token error' };
     }
+  }
+
+  async signout(token: string) {
+    console.log('token', token);
+    const user = await this.userService.getUserByRefreshToken(token);
+    if (user.error)
+      return { error: 'User not found'};
+
+    const data = {
+      userId: user.userId,
+      refreshToken: null
+    } as User;
+
+    const result = await this.userService.updateUser(data);
+    if (result.error)
+      return result;
+
+    return 'Sign out success';
   }
 
   async checkPositionFromToken(accessToken: string, position: string) {
@@ -189,8 +225,8 @@ export class AuthService {
   }
 
   async validate(payload: JwtPayload): Promise<any> {
-    if (!payload) return { error: 'Invalid token' };
-    return await this.userService.getUserById(payload.userId);
+    if (!payload || !payload.refreshToken) return { error: 'Invalid token' };
+    return await this.userService.getUserByRefreshToken(payload.refreshToken);
   }
 
   private async validatePassword(user: User, password: string) {
@@ -202,7 +238,7 @@ export class AuthService {
   private async createToken(payload: JwtPayload) {
     const accessToken = this.jwtService.sign(payload);
     return {
-      expiresIn: 3600 * 24 * 3,
+      expiresIn: 3600 * 24 * 365,
       accessToken
     }
   }
