@@ -8,6 +8,7 @@ import MulterConfigService from '../config/multerconfig.service';
 import { StadiumModule } from '../stadium/stadium.module';
 import { BillModule } from '../bill/bill.module';
 import { OperationTimeModule } from '../operationTime/operationTime.module';
+import { UserModule } from '../user/user.module';
 
 @Global()
 @Module({
@@ -19,7 +20,8 @@ import { OperationTimeModule } from '../operationTime/operationTime.module';
     DatabaseModule,
     StadiumModule,
     BillModule,
-    OperationTimeModule
+    OperationTimeModule,
+    UserModule
   ],
   exports: [BookingService],
   controllers: [BookingController],

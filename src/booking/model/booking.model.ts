@@ -13,6 +13,7 @@ import { User } from '../../user/model/user.model';
 import { BOOKING_STATUS } from '../constant/booking-status';
 import { Stadium } from '../../stadium/model/stadium.model';
 import { Bill } from '../../bill/model/bill.model';
+import { USER_POSITION } from 'src/user/constant/user-position';
 
 @Table({
     timestamps: true,
@@ -42,13 +43,27 @@ export class Booking extends Model<Booking> {
     @Column
     status: string;
 
+    @AllowNull(true)
     @ForeignKey(() => User)
-    @AllowNull(false)
     @Column
     userId: number;
 
     @BelongsTo(() => User)
-    owner: User;
+    user: User;
+
+    @AllowNull(true)
+    @Default('')
+    @Column
+    ownerName: string;
+
+    @AllowNull(true)
+    @Column
+    ownerInfo: string;
+
+    @AllowNull(true)
+    @Default(USER_POSITION.GENERAL_PUBLIC)
+    @Column
+    ownerPosition: string;
 
     @ForeignKey(() => Bill)
     @AllowNull(true)

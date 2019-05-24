@@ -69,19 +69,20 @@ export class BookingController {
 
   @UseGuards(AuthGuard())
   @UsePipes(new ValidationPipe())
-  @Post()
-  async book(@Body() dto: BookingDTO, @Res() res) {
-    const result = await this.bookingService.book(BookingDTO.toModel(dto));
+  @Post('/')
+  async book(@Body() dtos: BookingDTO[], @Req() req, @Res() res) {
+    const bookingModels = dtos.map(dto => (BookingDTO.toModel(dto)));
+    const user = await this.authService.validateToken(extractToken(req));
+    const result = await this.bookingService.bookMany(user.position, bookingModels);
     return res.status(HttpStatus.OK).json(result);
   }
 
   @UseGuards(AuthGuard())
   @UsePipes(new ValidationPipe())
-  @Post('/many')
-  async bookMany(@Body() dtos: BookingDTO[], @Req() req, @Res() res) {
+  @Post('/admin')
+  async bookAdmin(@Body() dtos: BookingDTO[], @Res() res) {
     const bookingModels = dtos.map(dto => (BookingDTO.toModel(dto)));
-    const user = await this.authService.validateToken(extractToken(req));
-    const result = await this.bookingService.bookMany(user.position, bookingModels);
+    const result = await this.bookingService.bookByAdmin(bookingModels);
     return res.status(HttpStatus.OK).json(result);
   }
 

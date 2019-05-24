@@ -10,6 +10,7 @@ import { StadiumService } from '../stadium/stadium.service';
 import { BillService } from '../bill/bill.service';
 import { OperationTimeService } from '../operationTime/operationTime.service';
 import moment from 'moment';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class BookingService {
@@ -17,6 +18,7 @@ export class BookingService {
     @Inject('bookingRepo') private readonly booking: typeof Booking,
     private readonly stadiumService: StadiumService,
     private readonly operationTimeService: OperationTimeService,
+    private readonly userService: UserService,
     @Inject(forwardRef(() => BillService)) private readonly billService: BillService
   ) { }
 
@@ -134,13 +136,31 @@ export class BookingService {
     return bill;
   }
 
-  async book(data: Booking) {
-    const error = await this.validateBooking(data);
-    if (error)
-      return error;
+  async bookByAdmin(dataList: Booking[]) {
+    let ownerPosition;
+    for (let data of dataList) {
+      const error = await this.validateBooking(data);
+      if (error)
+        return {
+          ...error,
+          data
+        };
+        ownerPosition = data.ownerPosition;
+    }
 
-    const booking = await this.booking.create(data);
-    return booking;
+    const stadiumId = dataList[0].stadiumId;
+    const stadium = await this.stadiumService.findById(stadiumId);
+
+    const results = await dataList.map((data) => {
+      data.fee = this.stadiumService.calculateBookingFee(ownerPosition, data, stadium);
+      data.status = BOOKING_STATUS.APPROVED;
+
+      console.log(data);
+      this.booking.create(data);
+      return data;
+    });
+
+    return results;
   }
 
   async update(bookingId: number, data: Booking) {
