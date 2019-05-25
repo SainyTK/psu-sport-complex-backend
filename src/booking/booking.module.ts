@@ -1,4 +1,5 @@
-import { Module, MulterModule, Global } from '@nestjs/common';
+import { Module, Global } from '@nestjs/common';
+import { MulterModule } from '@nestjs/platform-express';
 import { BookingController } from './booking.controller';
 import { BookingService } from './booking.service';
 import { BookingProviders } from './booking.provider';
@@ -9,6 +10,7 @@ import { StadiumModule } from '../stadium/stadium.module';
 import { BillModule } from '../bill/bill.module';
 import { OperationTimeModule } from '../operationTime/operationTime.module';
 import { UserModule } from '../user/user.module';
+import { BookingGateway } from './booking.gateway';
 
 @Global()
 @Module({
@@ -25,6 +27,6 @@ import { UserModule } from '../user/user.module';
   ],
   exports: [BookingService],
   controllers: [BookingController],
-  providers: [BookingService, ...BookingProviders],
+  providers: [BookingGateway, BookingService, ...BookingProviders],
 })
 export class BookingModule { }

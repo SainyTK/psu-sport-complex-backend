@@ -1,8 +1,10 @@
 import {
     Injectable,
-    MulterOptionsFactory,
-    MulterModuleOptions,
 } from '@nestjs/common';
+import {    
+    MulterOptionsFactory,
+    MulterModuleOptions
+} from '@nestjs/platform-express';
 import * as multer from 'multer';
 
 @Injectable()

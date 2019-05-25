@@ -1,4 +1,5 @@
-import { Module, MulterModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { MulterModule } from '@nestjs/platform-express';
 import { BillService } from './bill.service';
 import { BillController } from './bill.controller';
 import { BillProviders } from './bill.provider';

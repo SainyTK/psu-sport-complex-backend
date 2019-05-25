@@ -11,11 +11,11 @@ import {
   Patch,
   Req,
   UseInterceptors,
-  FileInterceptor,
   UploadedFile,
   HttpStatus,
   Delete,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { BookingService } from './booking.service';
 import { BookingDTO } from './dto/booking.dto';
 import { ValidationPipe } from '../common/validation.pipe';
