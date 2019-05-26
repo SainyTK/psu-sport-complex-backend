@@ -10,16 +10,17 @@ import { StadiumService } from '../stadium/stadium.service';
 import { BillService } from '../bill/bill.service';
 import { OperationTimeService } from '../operationTime/operationTime.service';
 import moment from 'moment';
-import { UserService } from '../user/user.service';
+import { BookingGateway } from './booking.gateway';
 
 @Injectable()
 export class BookingService {
+
   constructor(
     @Inject('bookingRepo') private readonly booking: typeof Booking,
     private readonly stadiumService: StadiumService,
     private readonly operationTimeService: OperationTimeService,
-    private readonly userService: UserService,
-    @Inject(forwardRef(() => BillService)) private readonly billService: BillService
+    @Inject(forwardRef(() => BillService)) private readonly billService: BillService,
+    private readonly gateway: BookingGateway
   ) { }
 
   async findAll() {
@@ -53,6 +54,7 @@ export class BookingService {
       include: [Stadium, User],
       where: { stadiumId }
     });
+
     return bookings;
   }
 
@@ -103,7 +105,9 @@ export class BookingService {
 
     const bookings = await this.findByBillId(billId);
 
-    const result = await Promise.all(bookings.map(booking => this.approve(booking.bookingId, true)))
+    const result = await Promise.all(bookings.map(booking => this.approve(booking.bookingId, true)));
+
+    this.serverEmit();
 
     return result;
   }
@@ -126,12 +130,20 @@ export class BookingService {
     const stadiumId = dataList[0].stadiumId;
     const stadium = await this.stadiumService.findById(stadiumId);
 
-    const results = await dataList.map((data) => {
-      data.billId = bill.billId;
-      data.fee = this.stadiumService.calculateBookingFee(userPosition, data, stadium);
-      this.booking.create(data);
-      return data;
-    });
+
+    const results = dataList.map((data) => (
+      new Promise((resolve, reject) => {
+        data.billId = bill.billId;
+        data.fee = this.stadiumService.calculateBookingFee(userPosition, data, stadium);
+        this.booking.create(data).then((v) => {
+          resolve(v.dataValues);
+        }).catch(e => { reject(e) });
+      })
+    ));
+
+    const bookings = await Promise.all(results);
+    
+    this.serverEmit();
 
     return bill;
   }
@@ -145,41 +157,52 @@ export class BookingService {
           ...error,
           data
         };
-        ownerPosition = data.ownerPosition;
+      ownerPosition = data.ownerPosition;
     }
 
     const stadiumId = dataList[0].stadiumId;
     const stadium = await this.stadiumService.findById(stadiumId);
 
-    const results = await dataList.map((data) => {
-      data.fee = this.stadiumService.calculateBookingFee(ownerPosition, data, stadium);
-      data.status = BOOKING_STATUS.APPROVED;
+    const results = dataList.map((data) => (
+      new Promise((resolve, reject) => {
+        data.fee = this.stadiumService.calculateBookingFee(ownerPosition, data, stadium);
+        data.status = BOOKING_STATUS.APPROVED;
+        this.booking.create(data).then((v) => {
+          resolve(v.dataValues);
+        }).catch(e => { reject(e) });
+      })
+    ));
 
-      console.log(data);
-      this.booking.create(data);
-      return data;
-    });
+    const bookings = await Promise.all(results);
+    
+    this.serverEmit();
 
-    return results;
+    return bookings;
   }
 
   async update(bookingId: number, data: Booking) {
     const booking = await this.findById(bookingId);
     if (!booking)
-      return {error: 'Booking not found'};
-    
+      return { error: 'Booking not found' };
+
     let error = this.operationTimeService.checkPassed(booking.startDate, booking.endDate);
     if (error) return error;
     let error2 = await this.validateBooking(data);
     if (error2) return error2;
 
     await booking.update(data);
+    
+    this.serverEmit();
+
     return 'update success';
   }
 
   async deleteById(bookingId: number) {
     const booking = await this.booking.findByPk(bookingId);
     await booking.destroy()
+
+    this.serverEmit();
+
     return 'delete success';
   }
 
@@ -190,6 +213,8 @@ export class BookingService {
     });
 
     await this.billService.deleteById(billId);
+
+    this.serverEmit();
 
     return 'delete success';
   }
@@ -249,6 +274,10 @@ export class BookingService {
       }
     });
     return bookings;
+  }
+
+  private serverEmit() {
+    this.gateway.server.emit('booking');
   }
 
 }
