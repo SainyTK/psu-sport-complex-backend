@@ -13,7 +13,7 @@ import { User } from '../../user/model/user.model';
 import { BOOKING_STATUS } from '../constant/booking-status';
 import { Stadium } from '../../stadium/model/stadium.model';
 import { Bill } from '../../bill/model/bill.model';
-import { USER_POSITION } from 'src/user/constant/user-position';
+import { USER_POSITION } from '../../user/constant/user-position';
 
 @Table({
     timestamps: true,
