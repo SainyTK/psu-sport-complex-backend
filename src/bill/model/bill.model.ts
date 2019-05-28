@@ -49,4 +49,24 @@ export class Bill extends Model<Bill> {
     @BelongsTo(() => Transaction, { foreignKey: { allowNull: true }})
     transaction: Transaction;
 
+    //solve scb service
+    @AllowNull(true)
+    @Column
+    confirmAccount: string;
+
+    @AllowNull(true)
+    @Column
+    confirmDeposit: number;
+
+    @AllowNull(true)
+    @Column
+    confirmDate: Date;
+
+    @AllowNull(true)
+    @Column
+    expiresAt: Date;
+
+    @AllowNull(true)
+    @Column
+    slipUrl: string;
 }

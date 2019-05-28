@@ -6,6 +6,7 @@ import {
     PrimaryKey,
     Table,
     Default,
+    DataType
 } from 'sequelize-typescript';
 import { USER_POSITION } from '../constant/user-position';
 
@@ -72,7 +73,7 @@ export class User extends Model<User> {
 
     @AllowNull(true)
     @Default(null)
-    @Column
+    @Column({type: DataType.STRING(1023)})
     refreshToken: string;
 
     @AllowNull(true)

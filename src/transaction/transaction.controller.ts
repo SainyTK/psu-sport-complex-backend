@@ -21,9 +21,21 @@ export class TransactionController {
     return res.status(HttpStatus.OK).json(result);
   }
 
+  @Get('/unused')
+  async getUnUsedTransactions(@Res() res) {
+    const result = await this.transactionService.findUnused();
+    return res.status(HttpStatus.OK).json(result);
+  }
+
   @Get('/member')
   async getMemberTransactions(@Res() res) {
     const result = await this.transactionService.findMemberTransactions();
+    return res.status(HttpStatus.OK).json(result);
+  }
+
+  @Get('scb_status')
+  async getSCBServiceStatus(@Res() res) {
+    const result = await this.transactionService.getSCBServiceStatus();
     return res.status(HttpStatus.OK).json(result);
   }
 

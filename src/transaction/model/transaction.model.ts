@@ -6,7 +6,10 @@ import {
     PrimaryKey,
     Table,
     Default,
+    ForeignKey,
+    BelongsTo,
 } from 'sequelize-typescript';
+import { Bill } from '../../bill/model/bill.model';
 
 @Table
 export class Transaction extends Model<Transaction> {
@@ -36,4 +39,12 @@ export class Transaction extends Model<Transaction> {
     @AllowNull(false)
     @Column
     tid: string;
+
+    //solve scb service
+    @ForeignKey(() => Bill)
+    @AllowNull(true)
+    @Default(null)
+    @Column
+    billId: number;
+
 }

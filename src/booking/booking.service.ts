@@ -93,9 +93,9 @@ export class BookingService {
     if (!booking)
       return { error: 'booking not found' }
 
-    booking.status = isApprove ? BOOKING_STATUS.APPROVED : BOOKING_STATUS.UNAPPROVED;
+    const status = isApprove ? BOOKING_STATUS.APPROVED : BOOKING_STATUS.UNAPPROVED;
 
-    return await this.booking.update({ status: booking.status }, { where: { bookingId: booking.bookingId } });
+    return await booking.update({ status });
   }
 
   async approveByBill(billId: number) {
@@ -107,7 +107,7 @@ export class BookingService {
 
     const result = await Promise.all(bookings.map(booking => this.approve(booking.bookingId, true)));
 
-    this.serverEmit();
+    this.serverEmit('updateBookings', result);
 
     return result;
   }
@@ -143,7 +143,7 @@ export class BookingService {
 
     const bookings = await Promise.all(results);
     
-    this.serverEmit();
+    this.serverEmit('createBookings', bookings);
 
     return bill;
   }
@@ -175,7 +175,7 @@ export class BookingService {
 
     const bookings = await Promise.all(results);
     
-    this.serverEmit();
+    this.serverEmit('createBookings', bookings);
 
     return bookings;
   }
@@ -190,9 +190,9 @@ export class BookingService {
     let error2 = await this.validateBooking(data);
     if (error2) return error2;
 
-    await booking.update(data);
+    const result = await booking.update(data);
     
-    this.serverEmit();
+    this.serverEmit('updateBookings', result);
 
     return 'update success';
   }
@@ -201,7 +201,7 @@ export class BookingService {
     const booking = await this.booking.findByPk(bookingId);
     await booking.destroy()
 
-    this.serverEmit();
+    this.serverEmit('deleteBookings', booking);
 
     return 'delete success';
   }
@@ -214,7 +214,7 @@ export class BookingService {
 
     await this.billService.deleteById(billId);
 
-    this.serverEmit();
+    this.serverEmit('deleteBookings', bookings);
 
     return 'delete success';
   }
@@ -276,8 +276,8 @@ export class BookingService {
     return bookings;
   }
 
-  private serverEmit() {
-    this.gateway.server.emit('booking');
+  private serverEmit(pipeName, data) {
+    this.gateway.server.emit(pipeName, data);
   }
 
 }
