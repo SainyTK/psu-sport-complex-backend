@@ -79,21 +79,20 @@ export class TransactionService implements OnModuleInit {
     if (t)
       return { error: 'Already exist transaction' };
 
-    const { account, deposit, date } = transaction;
-    const unApprovedBill = await this.billService.findByConfirmInfo(account, deposit, date);
-    if (!unApprovedBill)
-      return false;
-
     const newTrans = await this.transaction.create(transaction) as Transaction;
 
-    await this.billService.confirm(unApprovedBill.billId, newTrans);
+    const { account, deposit, date } = transaction;
+    const unApprovedBill = await this.billService.findByConfirmInfo(account, deposit, date);
 
-    return await this.transaction.create(transaction);
+    if (unApprovedBill)
+      await this.billService.confirm(unApprovedBill.billId, newTrans);
+
+    return true;
   }
 
   async createMemberTransaction(amount: number) {
     const t = {
-      account: 'create memner',
+      account: 'create member',
       deposit: amount,
       date: moment().toDate(),
       used: true,

@@ -78,6 +78,11 @@ export class BillService implements OnModuleDestroy {
         return bill;
     }
 
+    async createBillByAdmin(userId: number, fee: number) {
+        const bill = await this.bill.create({ userId, fee });
+        return bill;
+    }
+
     async confirm(billId: number, transaction: Transaction) {
         const bill = await this.findById(billId);
         if (!bill) return { error: 'Bill not found' }

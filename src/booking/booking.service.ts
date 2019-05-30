@@ -150,6 +150,7 @@ export class BookingService {
 
   async bookByAdmin(dataList: Booking[]) {
     let ownerPosition;
+    let userId;
     for (let data of dataList) {
       const error = await this.validateBooking(data);
       if (error)
@@ -158,13 +159,18 @@ export class BookingService {
           data
         };
       ownerPosition = data.ownerPosition;
+      userId = data.userId;
     }
+
+    const fee = await this.stadiumService.calculateBookingsFee(ownerPosition, dataList);
+    const bill = await this.billService.createBillByAdmin(userId, fee);
 
     const stadiumId = dataList[0].stadiumId;
     const stadium = await this.stadiumService.findById(stadiumId);
 
     const results = dataList.map((data) => (
       new Promise((resolve, reject) => {
+        data.billId = bill.billId;
         data.fee = this.stadiumService.calculateBookingFee(ownerPosition, data, stadium);
         data.status = BOOKING_STATUS.APPROVED;
         this.booking.create(data).then((v) => {
@@ -192,7 +198,7 @@ export class BookingService {
 
     const result = await booking.update(data);
     
-    this.serverEmit('updateBookings', result);
+    this.serverEmit('updateBookings', [result]);
 
     return 'update success';
   }
@@ -201,7 +207,7 @@ export class BookingService {
     const booking = await this.booking.findByPk(bookingId);
     await booking.destroy()
 
-    this.serverEmit('deleteBookings', booking);
+    this.serverEmit('deleteBookings', [booking]);
 
     return 'delete success';
   }

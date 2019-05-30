@@ -101,7 +101,7 @@ export class OperationTimeService {
     }
 
     private checkOperationTime(operationTime, date) {
-        const mDate = moment(date);
+        const mDate = moment(date).second(0).millisecond(0);
 
         if (!operationTime)
             return `No service`;
@@ -113,7 +113,9 @@ export class OperationTimeService {
         const startOpDate = mDate.clone().hour(startHr).minute(startMin).second(0).millisecond(0);
         const endOpDate = mDate.clone().hour(endHr).minute(endMin).second(0).millisecond(0);
 
-        if (!mDate.isBetween(startOpDate, endOpDate) && !mDate.isSame(startOpDate) && !mDate.isSame(endOpDate))
+        const inOperationTime = mDate.isBetween(startOpDate, endOpDate) || mDate.isSame(startOpDate) || mDate.isSame(endOpDate);
+
+        if (!inOperationTime)
             return `Not in operation time`;
 
         return false;
