@@ -1,7 +1,7 @@
 [
     {
       "stadiumId": 1,
-      "name": "table tennis",
+      "name": "tabletennis",
       "numCourt": 3,
       "costStudent": 20,
       "costStaff": 30,
@@ -28,7 +28,7 @@
     },
     {
       "stadiumId": 4,
-      "name": "valley ball",
+      "name": "volleyball",
       "numCourt": 1,
       "costStudent": 500,
       "costStaff": 600,

@@ -14,6 +14,7 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import to from 'await-to-js';
 import { emailAddress, emailPassword, getPasswordResetText } from '../config/mail.config';
+import moment from 'moment';
 
 const saltRounds = 10;
 const PSU_URL = 'https://passport.psu.ac.th/authentication/authentication.asmx?wsdl';
@@ -143,10 +144,9 @@ export class AuthService {
   }
 
   async signout(token: string) {
-    console.log('token', token);
     const user = await this.userService.getUserByRefreshToken(token);
     if (user.error)
-      return { error: 'User not found'};
+      return { error: 'User not found' };
 
     const data = {
       userId: user.userId,
@@ -157,7 +157,7 @@ export class AuthService {
     if (result.error)
       return result;
 
-    return 'Sign out success';
+    return { message: 'Sign out success' };
   }
 
   async checkPositionFromToken(accessToken: string, position: string) {
@@ -238,7 +238,7 @@ export class AuthService {
   private async createToken(payload: JwtPayload) {
     const accessToken = this.jwtService.sign(payload);
     return {
-      expiresIn: 3600 * 24 * 365,
+      expiresAt: moment().add(1, 'month').format(),
       accessToken
     }
   }
@@ -260,7 +260,7 @@ export class AuthService {
         text: getPasswordResetText(token),
       }
       transporter.sendMail(mailOptions, (err, res) => {
-        if(err) return reject(err);
+        if (err) return reject(err);
         return resolve(res)
       })
     })
