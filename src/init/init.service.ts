@@ -48,8 +48,6 @@ export class InitService {
   async getInitStadiums() {
     return new Promise<Stadium[]>((resolve, reject) => {
       fs.readFile(`${__dirname}/../../file/stadium.json`, (err, data) => {
-        console.log(err);
-        console.log(data);
         if (err)
           reject(err);
         else
