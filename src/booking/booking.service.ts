@@ -108,6 +108,7 @@ export class BookingService {
     const result = await Promise.all(bookings.map(booking => this.approve(booking.bookingId, true)));
 
     this.serverEmit('updateBookings', result);
+    this.serverEmit('bookingApproved', bill);
 
     return result;
   }
@@ -226,11 +227,15 @@ export class BookingService {
   }
 
   private async filterExpired() {
-    const bookings = await this.booking.findAll({ where: { status: BOOKING_STATUS.UNPAID } });
+    const bookings = await this.booking.findAll({ 
+      where: { status: BOOKING_STATUS.UNPAID },
+      include: [Bill]
+    });
 
     for (let booking of bookings) {
-      if (moment().diff(booking.createdAt, 'minute') > 20)
-        await this.deleteById(booking.bookingId);
+      if (booking && moment().diff(booking.createdAt, 'minute') > 20)
+        await this.deleteByBillId(booking.billId);
+        this.serverEmit('bookingRejected', booking.bill);
     }
   }
 
