@@ -79,8 +79,8 @@ export class OperationTimeService {
 
         const operationTimes = await this.getOperationTimes();
 
-        const opTimeStart = operationTimes[mStart.format('dddd')];
-        const opTimeEnd = operationTimes[mEnd.format('dddd')];
+        const opTimeStart = operationTimes[mStart.format('dddd').toLowerCase()];
+        const opTimeEnd = operationTimes[mEnd.format('dddd').toLowerCase()];
 
         if (!opTimeStart)
             return `No service on ${mStart.format('dddd')}s`;
