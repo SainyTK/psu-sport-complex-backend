@@ -1,10 +1,9 @@
-import { Module, forwardRef } from '@nestjs/common';
-import { MulterModule } from '@nestjs/platform-express';
+import { Module } from '@nestjs/common';
 import { BillService } from './bill.service';
 import { BillController } from './bill.controller';
 import { BillProviders } from './bill.provider';
 import { DatabaseModule } from '../database/database.module';
-import { TransactionModule } from '../transaction/transaction.module';
+import { BillGateway } from './bill.gateway';
 
 @Module({
   imports: [
@@ -12,6 +11,6 @@ import { TransactionModule } from '../transaction/transaction.module';
   ],
   exports: [BillService],
   controllers: [BillController],
-  providers: [BillService, ...BillProviders],
+  providers: [BillService, BillGateway, ...BillProviders],
 })
 export class BillModule { }

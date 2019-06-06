@@ -227,16 +227,7 @@ export class BookingService {
   }
 
   private async filterExpired() {
-    const bookings = await this.booking.findAll({ 
-      where: { status: BOOKING_STATUS.UNPAID },
-      include: [Bill]
-    });
-
-    for (let booking of bookings) {
-      if (booking && moment().diff(booking.createdAt, 'minute') > 20)
-        await this.deleteByBillId(booking.billId);
-        this.serverEmit('bookingRejected', booking.bill);
-    }
+    await this.billService.filterExpired();
   }
 
   private async validateBooking(data: Booking) {
