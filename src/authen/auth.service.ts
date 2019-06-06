@@ -34,6 +34,21 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) { }
 
+  async createAdmin(data: User) {
+    if (data.psuPassport.length <= 0) {
+      let exist = await this.userService.checkExistingUser(data);
+      if (exist) {
+        return exist;
+      }
+    }
+
+    const hashPassword = await bcrypt.hash(data.password, saltRounds);
+    data.password = hashPassword;
+    data.position = USER_POSITION.ADMIN;
+    await this.userService.createUser(data);
+    return data;
+  }
+
   async signup(data: User) {
     if (data.psuPassport.length <= 0) {
       let exist = await this.userService.checkExistingUser(data);
