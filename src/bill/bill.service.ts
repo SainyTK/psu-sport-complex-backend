@@ -89,9 +89,9 @@ export class BillService implements OnModuleDestroy {
 
     async confirm(billId: number, transaction: Transaction) {
         const bill = await this.findById(billId);
-        if (!bill) return { error: 'Bill not found' }
-        if (bill.transactionId) return { error: 'Already confirm' }
-        if (bill.fee > transaction.deposit) return { error: 'Too low money' };
+        if (!bill) return { error: 'bill not found' }
+        if (bill.transactionId) return { error: 'already confirm' }
+        if (bill.fee > transaction.deposit) return { error: 'too low money' };
 
         await bill.update({
             expiresAt: moment().add(BILL_EXPIRES, 'minute').toDate(),
@@ -113,9 +113,9 @@ export class BillService implements OnModuleDestroy {
     async deleteById(billId: number) {
         const bill = await this.bill.findByPk(billId);
         if (!bill)
-            return { error: 'Bill not found' };
+            return { error: 'bill not found' };
         await bill.destroy();
-        return `Deleted bill id ${billId}`;
+        return `deleted bill id ${billId}`;
     }
 
     async filterExpired() {

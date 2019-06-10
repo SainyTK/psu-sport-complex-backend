@@ -39,7 +39,7 @@ export class UserService {
     })
 
     if (!user)
-      return { error: 'User not found' }
+      return { error: 'user not found' }
 
     return await this.filterMember(user);
   }
@@ -47,7 +47,7 @@ export class UserService {
   async getUserByPhoneNumber(phoneNumber: string): Promise<any> {
     const user = await this.user.findOne({ where: { phoneNumber } });
     if (!user)
-      return { error: 'User not found' };
+      return { error: 'user not found' };
     return await this.filterMember(user);
   }
 
@@ -61,7 +61,7 @@ export class UserService {
   async getUserByRefreshToken(refreshToken: string): Promise<any> {
     const user = await this.user.findOne({ where: { refreshToken } });
     if (!user)
-      return { error: 'User not found' };
+      return { error: 'user not found' };
     return await this.filterMember(user);
   }
 
@@ -85,7 +85,7 @@ export class UserService {
   async updateUser(data: User): Promise<any> {
     const user = await this.user.findByPk(data.userId);
     if (!user)
-      return { error: 'User not found' };
+      return { error: 'user not found' };
 
     return await user.update(data);
   }
@@ -93,7 +93,7 @@ export class UserService {
   async upgradeUser(userId: number, position: string) {
     const user = await this.user.findByPk(userId);
     if (!user)
-      return { error: 'User not found' };
+      return { error: 'user not found' };
 
     switch (position) {
       case 'member':
@@ -111,10 +111,10 @@ export class UserService {
     const user = await this.user.findByPk(userId);
 
     if (!user)
-      return { error: 'User not found' };
+      return { error: 'user not found' };
 
     if (user.position !== USER_POSITION.GENERAL_PUBLIC)
-      return { error: `This user can't upgrage to member` };
+      return { error: `this user can't upgrage to member` };
 
     user.memberStart = moment(startDate).toDate();
     user.memberEnd = moment(endDate).toDate();
@@ -134,7 +134,7 @@ export class UserService {
   async deleteUser(phoneNumber: string) {
     const user = await this.user.findOne({ where: { phoneNumber } });
     if (!user)
-      return { error: 'User not found' };
+      return { error: 'user not found' };
     await user.destroy();
     return true;
   }

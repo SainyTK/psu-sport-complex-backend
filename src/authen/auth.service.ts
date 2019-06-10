@@ -161,7 +161,7 @@ export class AuthService {
   async signout(token: string) {
     const user = await this.userService.getUserByRefreshToken(token);
     if (user.error)
-      return { error: 'User not found' };
+      return { error: 'user not found' };
 
     const data = {
       userId: user.userId,
@@ -172,7 +172,7 @@ export class AuthService {
     if (result.error)
       return result;
 
-    return { message: 'Sign out success' };
+    return { message: 'sign out success' };
   }
 
   async checkPositionFromToken(accessToken: string, position: string) {
@@ -212,7 +212,7 @@ export class AuthService {
     if (err)
       return { error: err }
 
-    return `Already send reset mail to ${user.email}`;
+    return `already send reset mail to ${user.email}`;
   }
 
   async resetPassword(resetPasswordToken: string, password: string) {
@@ -240,7 +240,7 @@ export class AuthService {
   }
 
   async validate(payload: JwtPayload): Promise<any> {
-    if (!payload || !payload.refreshToken) return { error: 'Invalid token' };
+    if (!payload || !payload.refreshToken) return { error: 'invalid token' };
     return await this.userService.getUserByRefreshToken(payload.refreshToken);
   }
 

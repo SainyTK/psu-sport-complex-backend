@@ -77,7 +77,7 @@ export class TransactionService implements OnModuleInit {
 
     const t = await this.transaction.find({ where: { tid: transaction.tid } });
     if (t)
-      return { error: 'Already exist transaction' };
+      return { error: 'already exist transaction' };
 
     const newTrans = await this.transaction.create(transaction) as Transaction;
 

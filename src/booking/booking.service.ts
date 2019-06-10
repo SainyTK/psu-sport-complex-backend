@@ -190,7 +190,7 @@ export class BookingService {
   async update(bookingId: number, data: Booking) {
     const booking = await this.findById(bookingId);
     if (!booking)
-      return { error: 'Booking not found' };
+      return { error: 'booking not found' };
 
     let error = this.operationTimeService.checkPassed(booking.startDate, booking.endDate);
     if (error) return error;
@@ -247,9 +247,9 @@ export class BookingService {
 
     const stadium = await this.stadiumService.findById(stadiumId);
     if (!stadium)
-      return { error: `Stadium doesn't exist` };
+      return { error: `stadium doesn't exist` };
     else if (courtId > stadium.numCourt || courtId <= 0)
-      return { error: `Court doens't exist` };
+      return { error: `court doens't exist` };
 
   }
 
