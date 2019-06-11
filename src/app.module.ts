@@ -7,6 +7,7 @@ import { BillModule } from './bill/bill.module';
 import { InitModule } from './init/init.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { OperationTimeModule } from './operationTime/operationTime.module';
+import { NewsModule } from './news/news.module';
 
 
 @Module({
@@ -18,7 +19,8 @@ import { OperationTimeModule } from './operationTime/operationTime.module';
     BookingModule,
     BillModule,
     TransactionModule,
-    OperationTimeModule
+    OperationTimeModule,
+    NewsModule
   ],
   controllers: [],
   providers: [],
