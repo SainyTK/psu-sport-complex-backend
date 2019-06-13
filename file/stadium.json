@@ -6,7 +6,10 @@
       "costStudent": 20,
       "costStaff": 30,
       "costMember": 50,
-      "costPublic": 80
+      "costPublic": 80,
+      "openAfter": "00:00",
+      "closeBefore": "00:00",
+      "canBook": true
     },
     {
       "stadiumId": 2,
@@ -15,7 +18,10 @@
       "costStudent": 60,
       "costStaff": 80,
       "costMember": 120,
-      "costPublic": 160
+      "costPublic": 160,
+      "openAfter": "00:00",
+      "closeBefore": "00:00",
+      "canBook": true
     },
     {
       "stadiumId": 3,
@@ -24,7 +30,10 @@
       "costStudent": 500,
       "costStaff": 600,
       "costMember": 800,
-      "costPublic": 1200
+      "costPublic": 1200,
+      "openAfter": "00:00",
+      "closeBefore": "00:00",
+      "canBook": true
     },
     {
       "stadiumId": 4,
@@ -33,7 +42,10 @@
       "costStudent": 500,
       "costStaff": 600,
       "costMember": 800,
-      "costPublic": 1200
+      "costPublic": 1200,
+      "openAfter": "00:00",
+      "closeBefore": "00:00",
+      "canBook": true
     },
     {
       "stadiumId": 5,
@@ -42,6 +54,9 @@
       "costStudent": 40,
       "costStaff": 60,
       "costMember": 80,
-      "costPublic": 100
+      "costPublic": 100,
+      "openAfter": "00:00",
+      "closeBefore": "00:00",
+      "canBook": true
     }
    ]

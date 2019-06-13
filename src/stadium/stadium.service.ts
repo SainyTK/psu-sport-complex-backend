@@ -17,8 +17,28 @@ export class StadiumService {
     return stadium;
   }
 
-  async insert(stadium: Stadium) {
-    return await this.stadium.create(stadium);
+  async insert(data: Stadium) {
+    return await this.stadium.create(data);
+  }
+
+  async update(stadiumId: number, data: Stadium) {
+    const stadium = await this.stadium.findById(stadiumId);
+    if (!stadium)
+      return { error: 'stadium not found' };
+
+    await stadium.update(data);
+
+    return 'update success';
+  }
+
+  async delete(stadiumId: number) {
+    const stadium = await this.stadium.findById(stadiumId);
+    if (!stadium)
+      return { error: 'stadium not found' };
+
+    await stadium.destroy();
+
+    return 'delete success';
   }
 
   calculateBookingFee(userPosition: string, booking: Booking, stadium: Stadium) {

@@ -5,8 +5,11 @@ import {
   Post,
   Body,
   Param,
+  Patch,
+  Delete,
 } from '@nestjs/common';
 import { StadiumService } from './stadium.service';
+import { StadiumDTO } from './dto/stadium.dto';
 
 @Controller('stadium')
 export class StadiumController {
@@ -25,8 +28,20 @@ export class StadiumController {
   }
 
   @Post()
-  async insert(@Body() data, @Res() res) {
-    const stadium = await this.stadiumService.insert(data);
+  async insert(@Body() data: StadiumDTO, @Res() res) {
+    const stadium = await this.stadiumService.insert(StadiumDTO.toModel(data));
+    return res.json(stadium);
+  }
+
+  @Patch('/:stadiumId')
+  async update(@Param('stadiumId') stadiumId, @Body() data: StadiumDTO, @Res() res) {
+    const stadium = await this.stadiumService.update(stadiumId, StadiumDTO.toModel(data));
+    return res.json(stadium);
+  }
+
+  @Delete('/:stadiumId')
+  async delete(@Param('stadiumId') stadiumId, @Res() res) {
+    const stadium = await this.stadiumService.delete(stadiumId);
     return res.json(stadium);
   }
 
