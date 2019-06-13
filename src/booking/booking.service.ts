@@ -194,7 +194,7 @@ export class BookingService {
 
     let error = this.operationTimeService.checkPassed(booking.startDate, booking.endDate);
     if (error) return error;
-    let error2 = await this.validateBooking(data);
+    let error2 = await this.validateBooking(data, bookingId);
     if (error2) return error2;
 
     const result = await booking.update(data);
@@ -230,7 +230,7 @@ export class BookingService {
     await this.billService.filterExpired();
   }
 
-  private async validateBooking(data: Booking) {
+  private async validateBooking(data: Booking, bookingId = null) {
     const { startDate, endDate, stadiumId, courtId } = data;
 
     if (startDate > endDate)
@@ -242,9 +242,12 @@ export class BookingService {
       return { error: outOfService };
 
     const overlapBooking = await this.findOverlapBooking(startDate, endDate, data);
-    if (overlapBooking.length > 0)
-      return { error: 'overlap booking' };
-
+    if (overlapBooking.length > 0) {
+      const other = overlapBooking.find((booking) => booking.bookingId !== +bookingId);
+      if (other)
+        return { error: 'overlap booking' };
+    }
+      
     const stadium = await this.stadiumService.findById(stadiumId);
     if (!stadium)
       return { error: `stadium doesn't exist` };
