@@ -4,7 +4,9 @@ import {
     Column,
     Model,
     PrimaryKey,
-    Table
+    Table,
+    DataType,
+    Default
 } from 'sequelize-typescript';
 
 @Table({
@@ -19,6 +21,16 @@ export class News extends Model<News> {
     newsId: number;
 
     @AllowNull(false)
+    @Default('')
     @Column
+    title: string;
+
+    @AllowNull(false)
+    @Default('')
+    @Column
+    featureImageUrl: string;
+
+    @AllowNull(false)
+    @Column({type: DataType.TEXT('long')})
     content: string;
 }

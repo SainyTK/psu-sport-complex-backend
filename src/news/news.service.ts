@@ -7,12 +7,20 @@ export class NewsService {
         @Inject('newsRepo') private readonly news: typeof News,
     ) { }
 
-    async getNews(off, lim) {
+    async getNews(newsId: number) {
+        const news = this.news.findById(newsId);
+        if (!news)
+            return { error: 'news not found' }
+        return news;
+    }
+
+    async getNewsFeed(off, lim) {
         const offset = parseInt(off) || 0;
         const limit = parseInt(lim) || 20;
         return await this.news.findAll({
             offset,
-            limit
+            limit,
+            order: [['createdAt', 'DESC']]
         });
     }
 

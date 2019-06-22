@@ -1,0 +1,1 @@
+export const fanpageUrl = `https://www.facebook.com/Sports-Complex-PSU-Phuket-571700533287729`;

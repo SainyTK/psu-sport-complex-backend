@@ -9,7 +9,6 @@ import { Stadium } from '../stadium/model/stadium.model';
 import { StadiumService } from '../stadium/stadium.service';
 import { BillService } from '../bill/bill.service';
 import { OperationTimeService } from '../operationTime/operationTime.service';
-import moment from 'moment';
 import { BookingGateway } from './booking.gateway';
 
 @Injectable()
@@ -252,7 +251,7 @@ export class BookingService {
     if (!stadium)
       return { error: `stadium doesn't exist` };
     else if (courtId > stadium.numCourt || courtId <= 0)
-      return { error: `court doens't exist` };
+      return { error: `court doesn't exist` };
 
   }
 

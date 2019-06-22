@@ -26,14 +26,6 @@ export class Booking extends Model<Booking> {
     @Column
     bookingId: number;
 
-    @AllowNull(true)
-    @Column
-    title: string;
-
-    @AllowNull(true)
-    @Column
-    description: string;
-
     @AllowNull(false)
     @Column
     fee: number;

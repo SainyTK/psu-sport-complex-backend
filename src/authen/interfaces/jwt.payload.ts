@@ -3,12 +3,13 @@ export class JwtPayload {
     fname: string;
     lname: string;
     phoneNumber: string;
-    emai: string;
+    email: string;
     psuPassport: string;
     dob: Date;
     gender: 'M' | 'F';
     position: string;
     refreshToken: string;
+    memberEnd: Date;
 
     public static fromModel(user) {
         const payload = {
@@ -16,12 +17,13 @@ export class JwtPayload {
             fname: user.fname,
             lname: user.lname,
             phoneNumber: user.phoneNumber,
-            emai: user.email,
+            email: user.email,
             psuPassport: user.psuPassport,
             dob: user.dob,
             gender: user.gender,
             position: user.position,
-            refreshToken: user.refreshToken
+            refreshToken: user.refreshToken,
+            memberEnd: user.memberEnd
         }
 
         return payload as JwtPayload;

@@ -57,7 +57,7 @@ export class UserController {
 
   @UseGuards(AuthGuard())
   @Patch()
-  async updateUser(@Body('user') data: User, @Res() res) {
+  async updateUser(@Body() data: User, @Res() res) {
     const user = await this.userService.updateUser(data);
     return res.json(user);
   }

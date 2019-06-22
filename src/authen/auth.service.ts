@@ -2,7 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import nodemailer from 'nodemailer';
+import domainName from '../config/domain.config';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interfaces/jwt.payload';
@@ -13,7 +13,7 @@ import * as soap from 'soap';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import to from 'await-to-js';
-import { emailAddress, emailPassword, getPasswordResetText } from '../config/mail.config';
+import { sendEmail } from '../common/utils/sendmail-utils';
 import moment from 'moment';
 
 const saltRounds = 10;
@@ -259,26 +259,13 @@ export class AuthService {
   }
 
   private async sentResetPasswordLink(user, token) {
-    return new Promise<any>((resolve, reject) => {
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: emailAddress,
-          pass: emailPassword
-        }
-      });
-
-      const mailOptions = {
-        from: emailAddress,
-        to: user.email,
-        subject: 'Reset password link',
-        text: getPasswordResetText(token),
-      }
-      transporter.sendMail(mailOptions, (err, res) => {
-        if (err) return reject(err);
-        return resolve(res)
-      })
-    })
+    const content = {
+      subject: 'Reset password link',
+      text: `You can reset password on the link below \n 
+            ${domainName}/reset_password?token=${token}`,
+      html: '',
+    }
+    return await sendEmail(user.email, content)
   }
 
   private async getPSUInfo(psuPassport: string, password: string): Promise<any> {

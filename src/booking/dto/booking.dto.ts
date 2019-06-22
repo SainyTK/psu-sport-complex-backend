@@ -2,10 +2,6 @@ import { IsInt, IsDateString, IsString } from 'class-validator';
 import { Booking } from '../model/booking.model';
 
 export class BookingDTO {
-    @IsString() readonly title: string;
-
-    @IsString() readonly description: string;
-
     @IsInt() readonly userId: number;
 
     @IsString() readonly ownerName: string;
@@ -24,8 +20,6 @@ export class BookingDTO {
 
     public static toModel(dto: BookingDTO) {
         let model = {
-            title: dto.title,
-            description: dto.description,
             userId: dto.userId,
             ownerName: dto.ownerName,
             ownerInfo: dto.ownerInfo,

@@ -7,6 +7,10 @@ import { Booking } from '../booking/model/booking.model';
 import moment from 'moment';
 import { ModuleRef } from '@nestjs/core';
 import { BillGateway } from './bill.gateway';
+import { sendEmail } from '../common/utils/sendmail-utils';
+import domain from '../config/domain.config';
+import { fanpageUrl } from '../config';
+import { User } from '../user/model/user.model';
 
 const BILL_EXPIRES = 20;
 
@@ -35,7 +39,7 @@ export class BillService implements OnModuleDestroy {
 
     async findById(billId: number) {
         await this.filterExpired();
-        return await this.bill.findOne({ where: { billId } })
+        return await this.bill.findOne({ where: { billId }, include: [Booking, User] })
     }
 
     async findByUserId(userId: number) {
@@ -103,11 +107,16 @@ export class BillService implements OnModuleDestroy {
         const t = await this.transactionService.find(transaction);
         if (!t) return { error: 'transaction not found' };
 
-        await bill.update({ transactionId: t.transactionId, expiresAt: null });
-        await this.transactionService.useTransaction(t.transactionId);
-        await this.bookingService.approveByBill(billId);
+        await this.approveBill(bill, t);
 
         return await this.bill.findByPk(billId, { include: [Booking] });
+    }
+
+    private async approveBill(bill: Bill, t: Transaction) {
+        await bill.update({ transactionId: t.transactionId, expiresAt: null });
+        await this.transactionService.useTransaction(t.transactionId);
+        await this.bookingService.approveByBill(bill.billId);
+        this.sendApprovedEmail(bill);
     }
 
     async deleteById(billId: number) {
@@ -125,17 +134,46 @@ export class BillService implements OnModuleDestroy {
                 expiresAt: {
                     $lte: moment().toDate()
                 }
-            }
+            },
+            include: [User]
         });
 
         bills.forEach(async (bill) => {
-            await this.bookingService.deleteByBillId(bill.billId);
-            await this.deleteById(bill.billId);
+            if (bill) {
+                await this.bookingService.deleteByBillId(bill.billId);
+                await this.deleteById(bill.billId);
+                this.gateway.server.emit('bookingRejected', bill);
+                this.sendRejectedEmail(bill);
+            }
         });
 
-        bills.forEach((bill) => {
-            this.gateway.server.emit('bookingRejected', bill);
-        });
-            
     }
+
+    async sendApprovedEmail(bill: Bill) {
+        const { owner, bookings } = bill;
+        const { bookingId } = bookings[0];
+        const booking = await this.bookingService.findById(bookingId);
+        const { startDate, stadium } = booking;
+
+        const date = moment(startDate).format('DD-MM-YYYY');
+
+        const content = {
+            subject: `Your bookings have already approved`,
+            text: `You can check your booking at ${domain}/booking?sport=${stadium.name}&date=${date}`,
+            html: ``
+        }
+        return await sendEmail(owner.email, content);
+    }
+
+    async sendRejectedEmail(bill: Bill) {
+        const { owner } = bill;
+
+        const content = {
+            subject: `Your bookings have been rejected`,
+            text: ``,
+            html: `Please contact to <a href='${fanpageUrl}'>sport complex fanpage</a> and send your payment slip`
+        }
+        return await sendEmail(owner.email, content);
+    }
+
 }

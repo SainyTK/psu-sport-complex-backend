@@ -15,6 +15,7 @@ import {
 import { NewsService } from './news.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import multerConfig from '../config/multer.config';
+import { NewsDTO } from './dto/news.dto';
 
 @Controller('news')
 export class NewsController {
@@ -23,14 +24,20 @@ export class NewsController {
   ) { }
 
   @Get()
-  async getNews(@Query('limit') limit, @Query('offset') offset, @Res() res) {
-    const result = await this.newsService.getNews(offset, limit);
+  async getNewsFeed(@Query('limit') limit, @Query('offset') offset, @Res() res) {
+    const result = await this.newsService.getNewsFeed(offset, limit);
+    return res.status(HttpStatus.OK).json(result);
+  }
+
+  @Get('/:newsId')
+  async getNews(@Param('newsId') newsId, @Res() res) {
+    const result = await this.newsService.getNews(newsId);
     return res.status(HttpStatus.OK).json(result);
   }
 
   @Post()
-  async createNews(@Body() data, @Res() res) {
-    const result = await this.newsService.createNews(data);
+  async createNews(@Body() data: NewsDTO, @Res() res) {
+    const result = await this.newsService.createNews(NewsDTO.toModel(data));
     return res.status(HttpStatus.OK).json(result);
   }
 
