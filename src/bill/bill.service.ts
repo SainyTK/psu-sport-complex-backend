@@ -1,7 +1,6 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { Bill } from './model/bill.model';
 import { BookingService } from '../booking/booking.service';
-import { Transaction } from '../transaction/model/transaction.model';
 import { Booking } from '../booking/model/booking.model';
 import moment from 'moment';
 import { BillGateway } from './bill.gateway';
@@ -36,7 +35,7 @@ export class BillService {
         await this.filterExpired();
         return await this.bill.findAll({
             where: { userId },
-            include: [Booking, Transaction],
+            include: [Booking],
             order: [['createdAt', 'DESC']]
         })
     }

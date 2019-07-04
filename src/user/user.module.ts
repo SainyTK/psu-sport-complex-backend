@@ -4,13 +4,11 @@ import { UserService } from './user.service';
 import { UserProviders } from './user.provider';
 import { DatabaseModule } from '../database/database.module';
 import { PassportModule } from '@nestjs/passport';
-import { TransactionModule } from '../transaction/transaction.module';
 
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt'}),
-    DatabaseModule,
-    TransactionModule
+    DatabaseModule
   ],
   exports: [UserService],
   controllers: [UserController],

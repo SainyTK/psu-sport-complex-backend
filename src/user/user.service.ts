@@ -3,14 +3,12 @@ import { User } from './model/user.model';
 import { USER_POSITION } from './constant/user-position';
 import { MemberDTO } from './dto/member.dto';
 import moment from 'moment';
-import { TransactionService } from '../transaction/transaction.service';
 
 @Injectable()
 export class UserService {
 
   constructor(@Inject('userRepo') 
-    private readonly user: typeof User,
-    private readonly transactionService: TransactionService
+    private readonly user: typeof User
   ) { }
 
   async getAllUsers() {
@@ -125,8 +123,6 @@ export class UserService {
       memberEnd: moment(endDate).toDate(),
       position: USER_POSITION.MEMBER
     });
-
-    await this.transactionService.createMemberTransaction(amount);
 
     return result;
   }
