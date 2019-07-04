@@ -5,7 +5,6 @@ import { User } from '../user/model/user.model';
 import { Stadium } from '../stadium/model/stadium.model';
 import { Booking } from '../booking/model/booking.model';
 import { Bill } from '../bill/model/bill.model';
-import { Transaction } from '../transaction/model/transaction.model';
 import { Blackout } from '../operationTime/model/blackout.model';
 import { News } from '../news/model/news.model';
 
@@ -26,7 +25,6 @@ export const DatabaseProviders = [
                 Stadium,
                 Booking,
                 Bill,
-                Transaction,
                 Blackout,
                 News
             ]);

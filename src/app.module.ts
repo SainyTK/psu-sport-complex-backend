@@ -5,7 +5,6 @@ import { StadiumModule } from './stadium/stadium.module';
 import { BookingModule } from './booking/booking.module';
 import { BillModule } from './bill/bill.module';
 import { InitModule } from './init/init.module';
-import { TransactionModule } from './transaction/transaction.module';
 import { OperationTimeModule } from './operationTime/operationTime.module';
 import { NewsModule } from './news/news.module';
 
@@ -18,7 +17,6 @@ import { NewsModule } from './news/news.module';
     StadiumModule,
     BookingModule,
     BillModule,
-    TransactionModule,
     OperationTimeModule,
     NewsModule
   ],
