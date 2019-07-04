@@ -87,12 +87,12 @@ export class BookingService {
     return bookings;
   }
 
-  async approve(bookingId: number, isApprove: boolean) {
+  async approve(bookingId: number) {
     const booking = await this.booking.findByPk(bookingId);
     if (!booking)
       return { error: 'booking not found' }
 
-    const status = isApprove ? BOOKING_STATUS.APPROVED : BOOKING_STATUS.UNAPPROVED;
+    const status = BOOKING_STATUS.APPROVED;
 
     return await booking.update({ status });
   }
@@ -104,10 +104,35 @@ export class BookingService {
 
     const bookings = await this.findByBillId(billId);
 
-    const result = await Promise.all(bookings.map(booking => this.approve(booking.bookingId, true)));
+    const result = await Promise.all(bookings.map(booking => this.approve(booking.bookingId)));
 
     this.serverEmit('updateBookings', result);
     this.serverEmit('bookingApproved', bill);
+
+    return result;
+  }
+
+  async confirm(bookingId: number) {
+    const booking = await this.booking.findByPk(bookingId);
+    if (!booking)
+      return { error: 'booking not found' }
+
+    const status = BOOKING_STATUS.PAID;
+
+    return await booking.update({ status });
+  }
+
+  async confirmByBillId(billId: number) {
+    const bill = await this.billService.findById(billId);
+    if (!bill)
+      return { error: 'bill not found' };
+
+    const bookings = await this.findByBillId(billId);
+
+    const result = await Promise.all(bookings.map(booking => this.confirm(booking.bookingId)));
+
+    this.serverEmit('updateBookings', result);
+    this.serverEmit('bookingConfirmed', bill);
 
     return result;
   }
@@ -130,7 +155,6 @@ export class BookingService {
     const stadiumId = dataList[0].stadiumId;
     const stadium = await this.stadiumService.findById(stadiumId);
 
-
     const results = dataList.map((data) => (
       new Promise((resolve, reject) => {
         data.billId = bill.billId;
@@ -142,7 +166,7 @@ export class BookingService {
     ));
 
     const bookings = await Promise.all(results);
-    
+
     this.serverEmit('createBookings', bookings);
 
     return bill;
@@ -172,7 +196,7 @@ export class BookingService {
       new Promise((resolve, reject) => {
         data.billId = bill.billId;
         data.fee = this.stadiumService.calculateBookingFee(ownerPosition, data, stadium);
-        data.status = BOOKING_STATUS.APPROVED;
+        data.status = BOOKING_STATUS.PAID;
         this.booking.create(data).then((v) => {
           resolve(v.dataValues);
         }).catch(e => { reject(e) });
@@ -180,7 +204,7 @@ export class BookingService {
     ));
 
     const bookings = await Promise.all(results);
-    
+
     this.serverEmit('createBookings', bookings);
 
     return bookings;
@@ -197,7 +221,7 @@ export class BookingService {
     if (error2) return error2;
 
     const result = await booking.update(data);
-    
+
     this.serverEmit('updateBookings', [result]);
 
     return 'update success';
@@ -246,7 +270,7 @@ export class BookingService {
       if (other)
         return { error: 'overlap booking' };
     }
-      
+
     const stadium = await this.stadiumService.findById(stadiumId);
     if (!stadium)
       return { error: `stadium doesn't exist` };

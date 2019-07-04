@@ -95,17 +95,7 @@ export class BookingController {
   async approve(@Param('bookingId') bookingId, @Req() req, @Res() res) {
     await this.authService.checkAdminFromToken(extractToken(req));
 
-    const result = await this.bookingService.approve(bookingId, true);
-    return res.status(HttpStatus.OK).json(result);
-  }
-
-  @UseGuards(AuthGuard())
-  @UsePipes(new ValidationPipe())
-  @Patch('/unapprove/:bookingId')
-  async unApprove(@Param('bookingId') bookingId, @Req() req, @Res() res) {
-    await this.authService.checkAdminFromToken(extractToken(req));
-
-    const result = await this.bookingService.approve(bookingId, false);
+    const result = await this.bookingService.approve(bookingId);
     return res.status(HttpStatus.OK).json(result);
   }
 

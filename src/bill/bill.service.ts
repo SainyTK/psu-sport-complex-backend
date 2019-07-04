@@ -1,36 +1,26 @@
-import { Injectable, Inject, forwardRef, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { Bill } from './model/bill.model';
 import { BookingService } from '../booking/booking.service';
-import { TransactionService } from '../transaction/transaction.service';
 import { Transaction } from '../transaction/model/transaction.model';
 import { Booking } from '../booking/model/booking.model';
 import moment from 'moment';
-import { ModuleRef } from '@nestjs/core';
 import { BillGateway } from './bill.gateway';
 import { sendEmail } from '../common/utils/sendmail-utils';
 import domain from '../config/domain.config';
 import { fanpageUrl } from '../config';
 import { User } from '../user/model/user.model';
+import { BOOKING_STATUS } from '../booking/constant/booking-status';
 
 const BILL_EXPIRES = 20;
 
 @Injectable()
-export class BillService implements OnModuleDestroy {
-
-    private transactionService: TransactionService;
+export class BillService {
 
     constructor(
         @Inject('billRepo') private readonly bill: typeof Bill,
         @Inject(forwardRef(() => BookingService)) private readonly bookingService: BookingService,
-        private readonly gateway: BillGateway,
-        private readonly moduleRef: ModuleRef
+        private readonly gateway: BillGateway
     ) { }
-
-    onModuleInit() {
-        this.transactionService = this.moduleRef.get(TransactionService, { strict: false });
-    }
-
-    onModuleDestroy() { }
 
     async findAll() {
         await this.filterExpired();
@@ -49,27 +39,6 @@ export class BillService implements OnModuleDestroy {
             include: [Booking, Transaction],
             order: [['createdAt', 'DESC']]
         })
-    }
-
-    async findByConfirmInfo(account: string, deposit: number, date: Date) {
-        const bills = await this.bill.findAll({
-            where: {
-                // confirmAccount: account.slice(6, 10),
-                confirmDeposit: deposit,
-                confirmDate: {
-                    $between: [
-                        moment(date).subtract(1, 'minute').toDate(),
-                        moment(date).add(1, 'minute').toDate()
-                    ]
-                }
-            }
-        });
-
-        const bill = bills.pop();
-
-        if (!bill) return null;
-
-        return bill;
     }
 
     async getMyLastBill(userId: number) {
@@ -91,32 +60,29 @@ export class BillService implements OnModuleDestroy {
         return bill;
     }
 
-    async confirm(billId: number, transaction: Transaction) {
+    async confirm(billId: number, slipUrl: string) {
         const bill = await this.findById(billId);
         if (!bill) return { error: 'bill not found' }
-        if (bill.transactionId) return { error: 'already confirm' }
-        if (bill.fee > transaction.deposit) return { error: 'too low money' };
+        if (bill.slipUrl) return { error: 'already confirm' }
 
         await bill.update({
-            expiresAt: moment().add(BILL_EXPIRES, 'minute').toDate(),
-            confirmAccount: transaction.account,
-            confirmDeposit: transaction.deposit,
-            confirmDate: transaction.date
+            expiresAt: null,
+            slipUrl
         });
 
-        const t = await this.transactionService.find(transaction);
-        if (!t) return { error: 'transaction not found' };
-
-        await this.approveBill(bill, t);
+        await this.bookingService.confirmByBillId(billId);
 
         return await this.bill.findByPk(billId, { include: [Booking] });
     }
 
-    private async approveBill(bill: Bill, t: Transaction) {
-        await bill.update({ transactionId: t.transactionId, expiresAt: null });
-        await this.transactionService.useTransaction(t.transactionId);
-        await this.bookingService.approveByBill(bill.billId);
-        this.sendApprovedEmail(bill);
+    async approve(billId: number) {
+        const bill = await this.findById(billId);
+        if (!bill) return { error: 'bill not found' }
+        if (bill.bookings[0].status === BOOKING_STATUS.APPROVED) return { error: 'already approved' }
+
+        await this.bookingService.approveByBill(billId);
+
+        return await this.bill.findByPk(billId, { include: [Booking] });
     }
 
     async deleteById(billId: number) {
@@ -130,7 +96,7 @@ export class BillService implements OnModuleDestroy {
     async filterExpired() {
         const bills = await this.bill.findAll({
             where: {
-                transactionId: null,
+                slipUrl: null,
                 expiresAt: {
                     $lte: moment().toDate()
                 }
