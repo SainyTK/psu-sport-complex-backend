@@ -28,7 +28,7 @@ export class News extends Model<News> {
     @AllowNull(false)
     @Default('')
     @Column
-    featureImageUrl: string;
+    featuredImageUrl: string;
 
     @AllowNull(false)
     @Column({type: DataType.TEXT('long')})

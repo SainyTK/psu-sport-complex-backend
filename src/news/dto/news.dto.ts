@@ -9,7 +9,7 @@ export class NewsDTO {
     static toModel(dto: NewsDTO): News {
         const model = {
             title: dto.title,
-            featureImageUrl: dto.featuredImageUrl,
+            featuredImageUrl: dto.featuredImageUrl,
             content: dto.content
         } as News;
 
