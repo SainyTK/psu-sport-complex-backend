@@ -3,6 +3,7 @@ import { User } from './model/user.model';
 import { USER_POSITION } from './constant/user-position';
 import { MemberDTO } from './dto/member.dto';
 import moment from 'moment';
+import * as fs from 'fs';
 
 @Injectable()
 export class UserService {
@@ -81,7 +82,8 @@ export class UserService {
   }
 
   async toggleAdmin(userId: number, secret: string) {
-    if (secret !== 'psu-sport-complex')
+    const serverSecret = this.getServerSecret();
+    if (secret !== serverSecret)
       return { error: 'secret invalid' }
 
     const user = await this.user.findById(userId);
@@ -168,5 +170,13 @@ export class UserService {
     const promises = users.map((user) => this.filterMember(user));
     const result = await Promise.all(promises);
     return result;
+  }
+
+  private getServerSecret() {
+    const data = fs.readFileSync(`${__dirname}/../../file/config.json`);
+
+    const config = JSON.parse(data.toString());
+
+    return config.secret;
   }
 }
