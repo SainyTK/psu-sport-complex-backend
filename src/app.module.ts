@@ -8,7 +8,6 @@ import { InitModule } from './init/init.module';
 import { OperationTimeModule } from './operationTime/operationTime.module';
 import { NewsModule } from './news/news.module';
 
-
 @Module({
   imports: [
     InitModule,

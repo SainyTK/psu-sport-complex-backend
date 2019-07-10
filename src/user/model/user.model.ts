@@ -53,6 +53,11 @@ export class User extends Model<User> {
     @Column
     position: string;
 
+    @AllowNull(false)
+    @Default(GENERAL_PUBLIC)
+    @Column
+    prevPosition: string;
+
     @AllowNull(true)
     @Default(null)
     @Column

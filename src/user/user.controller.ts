@@ -19,7 +19,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from '../authen/auth.service';
 import { extractToken } from '../common/utils/extract-token';
 import { MemberDTO } from './dto/member.dto';
-
+import { AdminGuard } from '../authen/guards/admin.guard';
 
 @Controller('user')
 export class UserController {
@@ -40,17 +40,17 @@ export class UserController {
     return res.json(result);
   }
 
-  @UseGuards(AuthGuard())
+  @UseGuards(AdminGuard)
   @Patch('/upgrade/:userId')
-  async upgradeUser(@Body('position') position: string,@Param('userId') userId: number, @Req() req, @Res() res) {
+  async upgradeUser(@Body('position') position: string, @Param('userId') userId: number, @Req() req, @Res() res) {
     await this.authService.checkAdminFromToken(extractToken(req));
     const result = await this.userService.upgradeUser(userId, position);
-    return res.json({result});
+    return res.json({ result });
   }
 
   @Patch('/member/:userId')
   @UsePipes(new ValidationPipe())
-  async toMember(@Body() data: MemberDTO,@Param('userId') userId, @Res() res) {
+  async toMember(@Body() data: MemberDTO, @Param('userId') userId, @Res() res) {
     const result = await this.userService.toMember(+userId, data);
     return res.status(HttpStatus.OK).json(result);
   }
@@ -62,7 +62,14 @@ export class UserController {
     return res.json(user);
   }
 
-  @UseGuards(AuthGuard())
+  @UseGuards(AdminGuard)
+  @Patch('/toggle_admin/:userId')
+  async toggleAdmin(@Body('secret') secret: string, @Param('userId') userId: number, @Res() res) {
+    const result = await this.userService.toggleAdmin(userId, secret);
+    return res.json(result);
+  }
+
+  @UseGuards(AdminGuard)
   @Delete()
   async deleteUser(@Body('phoneNumber') phoneNumber: string, @Res() res) {
     await this.userService.deleteUser(phoneNumber);

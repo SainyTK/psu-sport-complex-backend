@@ -7,8 +7,8 @@ import moment from 'moment';
 @Injectable()
 export class UserService {
 
-  constructor(@Inject('userRepo') 
-    private readonly user: typeof User
+  constructor(@Inject('userRepo')
+  private readonly user: typeof User
   ) { }
 
   async getAllUsers() {
@@ -64,7 +64,7 @@ export class UserService {
   }
 
   async createUser(data: User) {
-    return await this.user.create(data);
+    return await this.user.create({ ...data, prevPosition: data.position });
   }
 
   async checkExistingUser({ phoneNumber }: User) {
@@ -78,6 +78,20 @@ export class UserService {
         return { error: 'user exist' };
     }
     return false;
+  }
+
+  async toggleAdmin(userId: number, secret: string) {
+    if (secret !== 'psu-sport-complex')
+      return { error: 'secret invalid' }
+
+    const user = await this.user.findById(userId);
+    if (!user)
+      return { error: 'user not found' };
+
+    const toggledPosition = user.position === USER_POSITION.ADMIN ? user.prevPosition : USER_POSITION.ADMIN;
+    await user.update({ position: toggledPosition, prevPosition: user.position });
+
+    return 'update success';
   }
 
   async updateUser(data: User): Promise<any> {

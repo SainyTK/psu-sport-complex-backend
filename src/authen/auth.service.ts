@@ -184,8 +184,10 @@ export class AuthService {
 
   async checkAdminFromToken(accessToken: string) {
     const isAdmin = await this.checkPositionFromToken(accessToken, USER_POSITION.ADMIN);
-    if (!isAdmin)
+    if (!isAdmin) {
       throw new UnauthorizedException('permission denied');
+    }
+    return true;
   }
 
   async checkOwnerFromToken(accessToken: string, booking: Booking) {
@@ -299,7 +301,7 @@ export class AuthService {
   }
 
   private getPSUSignType(psuPassport: string) {
-    if (psuPassport.charAt(0).match(/a-z/)) {
+    if (psuPassport.charAt(0).match(/[a-z]/)) {
       return 'staff';
     }
 
