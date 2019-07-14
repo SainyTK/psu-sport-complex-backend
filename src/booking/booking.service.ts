@@ -169,7 +169,15 @@ export class BookingService {
 
     this.serverEmit('createBookings', bookings);
 
-    return bill;
+    return {
+      billId: bill.billId,
+      createdAt: bill.createdAt,
+      expiresAt: bill.expiresAt,
+      updatedAt: bill.updatedAt,
+      fee: bill.fee,
+      userId: bill.userId,
+      bookings: bookings
+    }
   }
 
   async bookByAdmin(dataList: Booking[]) {

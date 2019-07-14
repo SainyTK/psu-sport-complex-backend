@@ -101,6 +101,10 @@ export class UserService {
     if (!user)
       return { error: 'user not found' };
 
+    const u = await this.user.find({ where: { phoneNumber: data.phoneNumber } });
+    if (u)
+      return { error: 'phone number in used'};
+
     return await user.update(data);
   }
 
